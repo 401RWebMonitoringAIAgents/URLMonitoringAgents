@@ -1,6 +1,7 @@
 import os
 import logging
 import aiohttp
+import json
 from typing import Any, AsyncIterable, Optional, TypedDict
 from typing_extensions import Unpack
 
@@ -9,55 +10,62 @@ from strands.types.content import Messages
 from strands.types.streaming import StreamEvent
 from strands.types.tools import ToolSpec
 
+from perplexity import Perplexity
+    
+from strands.types.streaming import StreamEvent
+
 logger = logging.getLogger(__name__)
 
-class PerplexityModel(Model):
-
-    class ModelConfig(TypedDict):
-        model_id: str
-        params: Optional[dict[str, Any]]
-
-    def __init__(self, api_key: str, **model_config) -> None:
-      
+class PerplexityModel:
+    def __init__(self, api_key, model_id, params=None):
         self.api_key = api_key
-        self.config = PerplexityModel.ModelConfig(**model_config)
-        logger.debug("config=<%s> | initializing", self.config)
+        self.model_id = model_id
+        self.config = {"model_id": model_id, "params": params or {}}
 
-    def update_config(self, **model_config: Unpack[ModelConfig]) -> None:
-        self.config.update(model_config)
+    async def stream(self, messages:str, tool_specs=None, system_prompt=None, **kwargs):
+        
+        if isinstance(messages, list):
+      
+          cleaned = []
+          
+          for m in messages:
+              if isinstance(m, dict):
+                  role = m.get("role", "user")
+                  content = m.get("content", "")
+                  if isinstance(content, list):
+                      # Flatten again here (for list-of-blocks)
+                      content = "".join(
+                          block.get("text", str(block)) for block in content if isinstance(block, dict)
+                      ) if content and isinstance(content[0], dict) else str(content)
+                  cleaned.append({"role": role, "content": content})
+              else:
+                  cleaned.append({"role": "user", "content": str(m)})
+          
+          messages = cleaned
 
-    def get_config(self) -> ModelConfig:
-        return self.config
+        client = Perplexity(api_key=self.api_key) 
 
-    async def stream(
-    self,
-    messages: Messages,
-    tool_specs: Optional[list[ToolSpec]] = None,
-    system_prompt: Optional[str] = None,
-    **kwargs: Any
-  ) -> AsyncIterable[StreamEvent]:
-      # Ensure messages is a list of dicts
-      assert isinstance(messages, list) and isinstance(messages[0], dict)
+        # Optionally prepend system prompt
+        if system_prompt:
+            messages.insert(0, {"role": "system", "content": system_prompt})
 
-      request = {
-          "model": self.config["model_id"],
-          "messages": messages,
-          "params": self.config.get("params") or {}
-      }
-      if system_prompt:
-          request["system_prompt"] = system_prompt
+        yield StreamEvent(messageStart={"role": "assistant"})
 
-      headers = {
-          "Authorization": f"Bearer {self.api_key}",
-          "Content-Type": "application/json"
-      }
-      api_url = "https://api.perplexity.ai/chat/completions"
-      async with aiohttp.ClientSession() as session:
-          async with session.post(api_url, json=request, headers=headers) as resp:
-              resp.raise_for_status()
-              async for line in resp.content:
-                  yield self._parse_stream_event(line)
+        stream = client.chat.completions.create(
+            model=self.config["model_id"],
+            messages=messages,
+            stream=True,
+            **self.config.get("params", {})
+        )
 
+        for chunk in stream:
+            content = getattr(chunk.choices[0].delta, "content", None)
+            if content:
+                yield StreamEvent(contentBlockDelta={"delta": {"text": content}})
+            if chunk.choices[0].finish_reason:
+                break
+
+        yield StreamEvent(messageStop={"stopReason": "end_turn"})
 
     def _parse_stream_event(self, line):
         # Convert received chunk into a StreamEvent

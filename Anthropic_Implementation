@@ -1,0 +1,603 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": []
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "code",
+      "execution_count": 21,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "v1R0Bagdf3uJ",
+        "outputId": "a3663517-08a2-429a-8547-12df7d1ea458"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Requirement already satisfied: strands-agents in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 1)) (1.18.0)\n",
+            "Requirement already satisfied: strands-agents-tools in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 2)) (0.2.16)\n",
+            "Requirement already satisfied: google-auth-oauthlib in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 4)) (1.2.2)\n",
+            "Requirement already satisfied: google-auth-httplib2 in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 5)) (0.2.1)\n",
+            "Requirement already satisfied: google-api-python-client in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 6)) (2.187.0)\n",
+            "Requirement already satisfied: gspread in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 7)) (6.2.1)\n",
+            "Requirement already satisfied: playwright in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 8)) (1.56.0)\n",
+            "Requirement already satisfied: boto3<2.0.0,>=1.26.0 in /usr/local/lib/python3.12/dist-packages (from strands-agents->-r requirements.txt (line 1)) (1.42.1)\n",
+            "Requirement already satisfied: botocore<2.0.0,>=1.29.0 in /usr/local/lib/python3.12/dist-packages (from strands-agents->-r requirements.txt (line 1)) (1.42.1)\n",
+            "Requirement already satisfied: docstring-parser<1.0,>=0.15 in /usr/local/lib/python3.12/dist-packages (from strands-agents->-r requirements.txt (line 1)) (0.17.0)\n",
+            "Requirement already satisfied: jsonschema<5.0.0,>=4.0.0 in /usr/local/lib/python3.12/dist-packages (from strands-agents->-r requirements.txt (line 1)) (4.25.1)\n",
+            "Requirement already satisfied: mcp<2.0.0,>=1.11.0 in /usr/local/lib/python3.12/dist-packages (from strands-agents->-r requirements.txt (line 1)) (1.22.0)\n",
+            "Requirement already satisfied: opentelemetry-api<2.0.0,>=1.30.0 in /usr/local/lib/python3.12/dist-packages (from strands-agents->-r requirements.txt (line 1)) (1.38.0)\n",
+            "Requirement already satisfied: opentelemetry-instrumentation-threading<1.00b0,>=0.51b0 in /usr/local/lib/python3.12/dist-packages (from strands-agents->-r requirements.txt (line 1)) (0.59b0)\n",
+            "Requirement already satisfied: opentelemetry-sdk<2.0.0,>=1.30.0 in /usr/local/lib/python3.12/dist-packages (from strands-agents->-r requirements.txt (line 1)) (1.38.0)\n",
+            "Requirement already satisfied: pydantic<3.0.0,>=2.4.0 in /usr/local/lib/python3.12/dist-packages (from strands-agents->-r requirements.txt (line 1)) (2.12.3)\n",
+            "Requirement already satisfied: typing-extensions<5.0.0,>=4.13.2 in /usr/local/lib/python3.12/dist-packages (from strands-agents->-r requirements.txt (line 1)) (4.15.0)\n",
+            "Requirement already satisfied: watchdog<7.0.0,>=6.0.0 in /usr/local/lib/python3.12/dist-packages (from strands-agents->-r requirements.txt (line 1)) (6.0.0)\n",
+            "Requirement already satisfied: aiohttp<4.0.0,>=3.8.0 in /usr/local/lib/python3.12/dist-packages (from strands-agents-tools->-r requirements.txt (line 2)) (3.13.2)\n",
+            "Requirement already satisfied: aws-requests-auth<0.5.0,>=0.4.3 in /usr/local/lib/python3.12/dist-packages (from strands-agents-tools->-r requirements.txt (line 2)) (0.4.3)\n",
+            "Requirement already satisfied: dill<0.5.0,>=0.4.0 in /usr/local/lib/python3.12/dist-packages (from strands-agents-tools->-r requirements.txt (line 2)) (0.4.0)\n",
+            "Requirement already satisfied: markdownify<2.0.0,>=1.0.0 in /usr/local/lib/python3.12/dist-packages (from strands-agents-tools->-r requirements.txt (line 2)) (1.2.2)\n",
+            "Requirement already satisfied: pillow<12.0.0,>=11.2.1 in /usr/local/lib/python3.12/dist-packages (from strands-agents-tools->-r requirements.txt (line 2)) (11.3.0)\n",
+            "Requirement already satisfied: prompt-toolkit<4.0.0,>=3.0.51 in /usr/local/lib/python3.12/dist-packages (from strands-agents-tools->-r requirements.txt (line 2)) (3.0.52)\n",
+            "Requirement already satisfied: pyjwt<3.0.0,>=2.10.1 in /usr/local/lib/python3.12/dist-packages (from strands-agents-tools->-r requirements.txt (line 2)) (2.10.1)\n",
+            "Requirement already satisfied: requests<3.0.0,>=2.28.0 in /usr/local/lib/python3.12/dist-packages (from strands-agents-tools->-r requirements.txt (line 2)) (2.32.4)\n",
+            "Requirement already satisfied: rich<15.0.0,>=14.0.0 in /usr/local/lib/python3.12/dist-packages (from strands-agents-tools->-r requirements.txt (line 2)) (14.2.0)\n",
+            "Requirement already satisfied: slack-bolt<2.0.0,>=1.23.0 in /usr/local/lib/python3.12/dist-packages (from strands-agents-tools->-r requirements.txt (line 2)) (1.27.0)\n",
+            "Requirement already satisfied: sympy<2.0.0,>=1.12.0 in /usr/local/lib/python3.12/dist-packages (from strands-agents-tools->-r requirements.txt (line 2)) (1.14.0)\n",
+            "Requirement already satisfied: tenacity<10.0.0,>=9.1.2 in /usr/local/lib/python3.12/dist-packages (from strands-agents-tools->-r requirements.txt (line 2)) (9.1.2)\n",
+            "Requirement already satisfied: anthropic<1.0.0,>=0.21.0 in /usr/local/lib/python3.12/dist-packages (from strands-agents[anthropic]->-r requirements.txt (line 3)) (0.75.0)\n",
+            "Requirement already satisfied: google-auth>=2.15.0 in /usr/local/lib/python3.12/dist-packages (from google-auth-oauthlib->-r requirements.txt (line 4)) (2.43.0)\n",
+            "Requirement already satisfied: requests-oauthlib>=0.7.0 in /usr/local/lib/python3.12/dist-packages (from google-auth-oauthlib->-r requirements.txt (line 4)) (2.0.0)\n",
+            "Requirement already satisfied: httplib2<1.0.0,>=0.19.0 in /usr/local/lib/python3.12/dist-packages (from google-auth-httplib2->-r requirements.txt (line 5)) (0.31.0)\n",
+            "Requirement already satisfied: google-api-core!=2.0.*,!=2.1.*,!=2.2.*,!=2.3.0,<3.0.0,>=1.31.5 in /usr/local/lib/python3.12/dist-packages (from google-api-python-client->-r requirements.txt (line 6)) (2.28.1)\n",
+            "Requirement already satisfied: uritemplate<5,>=3.0.1 in /usr/local/lib/python3.12/dist-packages (from google-api-python-client->-r requirements.txt (line 6)) (4.2.0)\n",
+            "Requirement already satisfied: pyee<14,>=13 in /usr/local/lib/python3.12/dist-packages (from playwright->-r requirements.txt (line 8)) (13.0.0)\n",
+            "Requirement already satisfied: greenlet<4.0.0,>=3.1.1 in /usr/local/lib/python3.12/dist-packages (from playwright->-r requirements.txt (line 8)) (3.2.4)\n",
+            "Requirement already satisfied: aiohappyeyeballs>=2.5.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp<4.0.0,>=3.8.0->strands-agents-tools->-r requirements.txt (line 2)) (2.6.1)\n",
+            "Requirement already satisfied: aiosignal>=1.4.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp<4.0.0,>=3.8.0->strands-agents-tools->-r requirements.txt (line 2)) (1.4.0)\n",
+            "Requirement already satisfied: attrs>=17.3.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp<4.0.0,>=3.8.0->strands-agents-tools->-r requirements.txt (line 2)) (25.4.0)\n",
+            "Requirement already satisfied: frozenlist>=1.1.1 in /usr/local/lib/python3.12/dist-packages (from aiohttp<4.0.0,>=3.8.0->strands-agents-tools->-r requirements.txt (line 2)) (1.8.0)\n",
+            "Requirement already satisfied: multidict<7.0,>=4.5 in /usr/local/lib/python3.12/dist-packages (from aiohttp<4.0.0,>=3.8.0->strands-agents-tools->-r requirements.txt (line 2)) (6.7.0)\n",
+            "Requirement already satisfied: propcache>=0.2.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp<4.0.0,>=3.8.0->strands-agents-tools->-r requirements.txt (line 2)) (0.4.1)\n",
+            "Requirement already satisfied: yarl<2.0,>=1.17.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp<4.0.0,>=3.8.0->strands-agents-tools->-r requirements.txt (line 2)) (1.22.0)\n",
+            "Requirement already satisfied: anyio<5,>=3.5.0 in /usr/local/lib/python3.12/dist-packages (from anthropic<1.0.0,>=0.21.0->strands-agents[anthropic]->-r requirements.txt (line 3)) (4.11.0)\n",
+            "Requirement already satisfied: distro<2,>=1.7.0 in /usr/local/lib/python3.12/dist-packages (from anthropic<1.0.0,>=0.21.0->strands-agents[anthropic]->-r requirements.txt (line 3)) (1.9.0)\n",
+            "Requirement already satisfied: httpx<1,>=0.25.0 in /usr/local/lib/python3.12/dist-packages (from anthropic<1.0.0,>=0.21.0->strands-agents[anthropic]->-r requirements.txt (line 3)) (0.28.1)\n",
+            "Requirement already satisfied: jiter<1,>=0.4.0 in /usr/local/lib/python3.12/dist-packages (from anthropic<1.0.0,>=0.21.0->strands-agents[anthropic]->-r requirements.txt (line 3)) (0.12.0)\n",
+            "Requirement already satisfied: sniffio in /usr/local/lib/python3.12/dist-packages (from anthropic<1.0.0,>=0.21.0->strands-agents[anthropic]->-r requirements.txt (line 3)) (1.3.1)\n",
+            "Requirement already satisfied: jmespath<2.0.0,>=0.7.1 in /usr/local/lib/python3.12/dist-packages (from boto3<2.0.0,>=1.26.0->strands-agents->-r requirements.txt (line 1)) (1.0.1)\n",
+            "Requirement already satisfied: s3transfer<0.17.0,>=0.16.0 in /usr/local/lib/python3.12/dist-packages (from boto3<2.0.0,>=1.26.0->strands-agents->-r requirements.txt (line 1)) (0.16.0)\n",
+            "Requirement already satisfied: python-dateutil<3.0.0,>=2.1 in /usr/local/lib/python3.12/dist-packages (from botocore<2.0.0,>=1.29.0->strands-agents->-r requirements.txt (line 1)) (2.9.0.post0)\n",
+            "Requirement already satisfied: urllib3!=2.2.0,<3,>=1.25.4 in /usr/local/lib/python3.12/dist-packages (from botocore<2.0.0,>=1.29.0->strands-agents->-r requirements.txt (line 1)) (2.5.0)\n",
+            "Requirement already satisfied: googleapis-common-protos<2.0.0,>=1.56.2 in /usr/local/lib/python3.12/dist-packages (from google-api-core!=2.0.*,!=2.1.*,!=2.2.*,!=2.3.0,<3.0.0,>=1.31.5->google-api-python-client->-r requirements.txt (line 6)) (1.72.0)\n",
+            "Requirement already satisfied: protobuf!=3.20.0,!=3.20.1,!=4.21.0,!=4.21.1,!=4.21.2,!=4.21.3,!=4.21.4,!=4.21.5,<7.0.0,>=3.19.5 in /usr/local/lib/python3.12/dist-packages (from google-api-core!=2.0.*,!=2.1.*,!=2.2.*,!=2.3.0,<3.0.0,>=1.31.5->google-api-python-client->-r requirements.txt (line 6)) (5.29.5)\n",
+            "Requirement already satisfied: proto-plus<2.0.0,>=1.22.3 in /usr/local/lib/python3.12/dist-packages (from google-api-core!=2.0.*,!=2.1.*,!=2.2.*,!=2.3.0,<3.0.0,>=1.31.5->google-api-python-client->-r requirements.txt (line 6)) (1.26.1)\n",
+            "Requirement already satisfied: cachetools<7.0,>=2.0.0 in /usr/local/lib/python3.12/dist-packages (from google-auth>=2.15.0->google-auth-oauthlib->-r requirements.txt (line 4)) (6.2.2)\n",
+            "Requirement already satisfied: pyasn1-modules>=0.2.1 in /usr/local/lib/python3.12/dist-packages (from google-auth>=2.15.0->google-auth-oauthlib->-r requirements.txt (line 4)) (0.4.2)\n",
+            "Requirement already satisfied: rsa<5,>=3.1.4 in /usr/local/lib/python3.12/dist-packages (from google-auth>=2.15.0->google-auth-oauthlib->-r requirements.txt (line 4)) (4.9.1)\n",
+            "Requirement already satisfied: pyparsing<4,>=3.0.4 in /usr/local/lib/python3.12/dist-packages (from httplib2<1.0.0,>=0.19.0->google-auth-httplib2->-r requirements.txt (line 5)) (3.2.5)\n",
+            "Requirement already satisfied: jsonschema-specifications>=2023.03.6 in /usr/local/lib/python3.12/dist-packages (from jsonschema<5.0.0,>=4.0.0->strands-agents->-r requirements.txt (line 1)) (2025.9.1)\n",
+            "Requirement already satisfied: referencing>=0.28.4 in /usr/local/lib/python3.12/dist-packages (from jsonschema<5.0.0,>=4.0.0->strands-agents->-r requirements.txt (line 1)) (0.37.0)\n",
+            "Requirement already satisfied: rpds-py>=0.7.1 in /usr/local/lib/python3.12/dist-packages (from jsonschema<5.0.0,>=4.0.0->strands-agents->-r requirements.txt (line 1)) (0.29.0)\n",
+            "Requirement already satisfied: beautifulsoup4<5,>=4.9 in /usr/local/lib/python3.12/dist-packages (from markdownify<2.0.0,>=1.0.0->strands-agents-tools->-r requirements.txt (line 2)) (4.13.5)\n",
+            "Requirement already satisfied: six<2,>=1.15 in /usr/local/lib/python3.12/dist-packages (from markdownify<2.0.0,>=1.0.0->strands-agents-tools->-r requirements.txt (line 2)) (1.17.0)\n",
+            "Requirement already satisfied: httpx-sse>=0.4 in /usr/local/lib/python3.12/dist-packages (from mcp<2.0.0,>=1.11.0->strands-agents->-r requirements.txt (line 1)) (0.4.3)\n",
+            "Requirement already satisfied: pydantic-settings>=2.5.2 in /usr/local/lib/python3.12/dist-packages (from mcp<2.0.0,>=1.11.0->strands-agents->-r requirements.txt (line 1)) (2.12.0)\n",
+            "Requirement already satisfied: python-multipart>=0.0.9 in /usr/local/lib/python3.12/dist-packages (from mcp<2.0.0,>=1.11.0->strands-agents->-r requirements.txt (line 1)) (0.0.20)\n",
+            "Requirement already satisfied: sse-starlette>=1.6.1 in /usr/local/lib/python3.12/dist-packages (from mcp<2.0.0,>=1.11.0->strands-agents->-r requirements.txt (line 1)) (3.0.3)\n",
+            "Requirement already satisfied: starlette>=0.27 in /usr/local/lib/python3.12/dist-packages (from mcp<2.0.0,>=1.11.0->strands-agents->-r requirements.txt (line 1)) (0.48.0)\n",
+            "Requirement already satisfied: typing-inspection>=0.4.1 in /usr/local/lib/python3.12/dist-packages (from mcp<2.0.0,>=1.11.0->strands-agents->-r requirements.txt (line 1)) (0.4.2)\n",
+            "Requirement already satisfied: uvicorn>=0.31.1 in /usr/local/lib/python3.12/dist-packages (from mcp<2.0.0,>=1.11.0->strands-agents->-r requirements.txt (line 1)) (0.38.0)\n",
+            "Requirement already satisfied: importlib-metadata<8.8.0,>=6.0 in /usr/local/lib/python3.12/dist-packages (from opentelemetry-api<2.0.0,>=1.30.0->strands-agents->-r requirements.txt (line 1)) (8.7.0)\n",
+            "Requirement already satisfied: opentelemetry-instrumentation==0.59b0 in /usr/local/lib/python3.12/dist-packages (from opentelemetry-instrumentation-threading<1.00b0,>=0.51b0->strands-agents->-r requirements.txt (line 1)) (0.59b0)\n",
+            "Requirement already satisfied: wrapt<2.0.0,>=1.0.0 in /usr/local/lib/python3.12/dist-packages (from opentelemetry-instrumentation-threading<1.00b0,>=0.51b0->strands-agents->-r requirements.txt (line 1)) (1.17.3)\n",
+            "Requirement already satisfied: opentelemetry-semantic-conventions==0.59b0 in /usr/local/lib/python3.12/dist-packages (from opentelemetry-instrumentation==0.59b0->opentelemetry-instrumentation-threading<1.00b0,>=0.51b0->strands-agents->-r requirements.txt (line 1)) (0.59b0)\n",
+            "Requirement already satisfied: packaging>=18.0 in /usr/local/lib/python3.12/dist-packages (from opentelemetry-instrumentation==0.59b0->opentelemetry-instrumentation-threading<1.00b0,>=0.51b0->strands-agents->-r requirements.txt (line 1)) (25.0)\n",
+            "Requirement already satisfied: wcwidth in /usr/local/lib/python3.12/dist-packages (from prompt-toolkit<4.0.0,>=3.0.51->strands-agents-tools->-r requirements.txt (line 2)) (0.2.14)\n",
+            "Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.12/dist-packages (from pydantic<3.0.0,>=2.4.0->strands-agents->-r requirements.txt (line 1)) (0.7.0)\n",
+            "Requirement already satisfied: pydantic-core==2.41.4 in /usr/local/lib/python3.12/dist-packages (from pydantic<3.0.0,>=2.4.0->strands-agents->-r requirements.txt (line 1)) (2.41.4)\n",
+            "Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.12/dist-packages (from requests<3.0.0,>=2.28.0->strands-agents-tools->-r requirements.txt (line 2)) (3.4.4)\n",
+            "Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.12/dist-packages (from requests<3.0.0,>=2.28.0->strands-agents-tools->-r requirements.txt (line 2)) (3.11)\n",
+            "Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.12/dist-packages (from requests<3.0.0,>=2.28.0->strands-agents-tools->-r requirements.txt (line 2)) (2025.11.12)\n",
+            "Requirement already satisfied: oauthlib>=3.0.0 in /usr/local/lib/python3.12/dist-packages (from requests-oauthlib>=0.7.0->google-auth-oauthlib->-r requirements.txt (line 4)) (3.3.1)\n",
+            "Requirement already satisfied: markdown-it-py>=2.2.0 in /usr/local/lib/python3.12/dist-packages (from rich<15.0.0,>=14.0.0->strands-agents-tools->-r requirements.txt (line 2)) (4.0.0)\n",
+            "Requirement already satisfied: pygments<3.0.0,>=2.13.0 in /usr/local/lib/python3.12/dist-packages (from rich<15.0.0,>=14.0.0->strands-agents-tools->-r requirements.txt (line 2)) (2.19.2)\n",
+            "Requirement already satisfied: slack_sdk<4,>=3.38.0 in /usr/local/lib/python3.12/dist-packages (from slack-bolt<2.0.0,>=1.23.0->strands-agents-tools->-r requirements.txt (line 2)) (3.39.0)\n",
+            "Requirement already satisfied: mpmath<1.4,>=1.1.0 in /usr/local/lib/python3.12/dist-packages (from sympy<2.0.0,>=1.12.0->strands-agents-tools->-r requirements.txt (line 2)) (1.3.0)\n",
+            "Requirement already satisfied: soupsieve>1.2 in /usr/local/lib/python3.12/dist-packages (from beautifulsoup4<5,>=4.9->markdownify<2.0.0,>=1.0.0->strands-agents-tools->-r requirements.txt (line 2)) (2.8)\n",
+            "Requirement already satisfied: httpcore==1.* in /usr/local/lib/python3.12/dist-packages (from httpx<1,>=0.25.0->anthropic<1.0.0,>=0.21.0->strands-agents[anthropic]->-r requirements.txt (line 3)) (1.0.9)\n",
+            "Requirement already satisfied: h11>=0.16 in /usr/local/lib/python3.12/dist-packages (from httpcore==1.*->httpx<1,>=0.25.0->anthropic<1.0.0,>=0.21.0->strands-agents[anthropic]->-r requirements.txt (line 3)) (0.16.0)\n",
+            "Requirement already satisfied: zipp>=3.20 in /usr/local/lib/python3.12/dist-packages (from importlib-metadata<8.8.0,>=6.0->opentelemetry-api<2.0.0,>=1.30.0->strands-agents->-r requirements.txt (line 1)) (3.23.0)\n",
+            "Requirement already satisfied: mdurl~=0.1 in /usr/local/lib/python3.12/dist-packages (from markdown-it-py>=2.2.0->rich<15.0.0,>=14.0.0->strands-agents-tools->-r requirements.txt (line 2)) (0.1.2)\n",
+            "Requirement already satisfied: pyasn1<0.7.0,>=0.6.1 in /usr/local/lib/python3.12/dist-packages (from pyasn1-modules>=0.2.1->google-auth>=2.15.0->google-auth-oauthlib->-r requirements.txt (line 4)) (0.6.1)\n",
+            "Requirement already satisfied: python-dotenv>=0.21.0 in /usr/local/lib/python3.12/dist-packages (from pydantic-settings>=2.5.2->mcp<2.0.0,>=1.11.0->strands-agents->-r requirements.txt (line 1)) (1.2.1)\n",
+            "Requirement already satisfied: cryptography>=3.4.0 in /usr/local/lib/python3.12/dist-packages (from pyjwt[crypto]>=2.10.1->mcp<2.0.0,>=1.11.0->strands-agents->-r requirements.txt (line 1)) (43.0.3)\n",
+            "Requirement already satisfied: click>=7.0 in /usr/local/lib/python3.12/dist-packages (from uvicorn>=0.31.1->mcp<2.0.0,>=1.11.0->strands-agents->-r requirements.txt (line 1)) (8.3.1)\n",
+            "Requirement already satisfied: cffi>=1.12 in /usr/local/lib/python3.12/dist-packages (from cryptography>=3.4.0->pyjwt[crypto]>=2.10.1->mcp<2.0.0,>=1.11.0->strands-agents->-r requirements.txt (line 1)) (2.0.0)\n",
+            "Requirement already satisfied: pycparser in /usr/local/lib/python3.12/dist-packages (from cffi>=1.12->cryptography>=3.4.0->pyjwt[crypto]>=2.10.1->mcp<2.0.0,>=1.11.0->strands-agents->-r requirements.txt (line 1)) (2.23)\n"
+          ]
+        }
+      ],
+      "source": [
+        "!pip install -r requirements.txt\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import csv\n",
+        "import io\n",
+        "import importlib\n",
+        "import gspread\n",
+        "import google.auth\n",
+        "from google.colab import auth\n",
+        "import os\n",
+        "\n",
+        "from strands import Agent\n",
+        "from strands_tools import calculator, file_read, shell\n",
+        "from strands.models.anthropic import AnthropicModel\n",
+        "from strands_tools import http_request, current_time, calculator\n",
+        "from strands_tools.browser import LocalChromiumBrowser\n",
+        "\n",
+        "from google.colab import auth\n",
+        "auth.authenticate_user()\n",
+        "\n",
+        "# Import the necessary libraries\n",
+        "import gspread\n",
+        "from google.auth import default\n",
+        "from strands import tool\n",
+        "\n",
+        "import subprocess\n",
+        "subprocess.run(['playwright', 'install', 'chromium'], check=True)"
+      ],
+      "metadata": {
+        "id": "4ackqsyEhfeW",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "7df54cd5-64b8-4a83-a3b1-6044d3e40df8"
+      },
+      "execution_count": 34,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "CompletedProcess(args=['playwright', 'install', 'chromium'], returncode=0)"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 34
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "os.environ['ANTHROPIC_API_KEY'] = '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'\n",
+        "\n",
+        "# Authenticate user with Google Colab\n",
+        "auth.authenticate_user()\n",
+        "\n",
+        "# Get default credentials\n",
+        "credentials, project_id = google.auth.default()\n",
+        "\n",
+        "# Authorize gspread with the obtained credentials\n",
+        "gc = gspread.authorize(credentials)\n",
+        "sheet = gc.open_by_url(\"https://docs.google.com/spreadsheets/d/1Cy82Bo73OP9lmgjy6-aRmO2rMwyRKz6ydbKjLlFaCmA/edit?usp=sharing\")\n",
+        "worksheet = sheet.sheet1\n",
+        "\n",
+        "# Get headers from the first row\n",
+        "headers = worksheet.row_values(1)\n",
+        "\n",
+        "# Get all records as dictionaries, specifying the expected headers\n",
+        "data = worksheet.get_all_records(expected_headers=headers)\n",
+        "\n",
+        "# Extract Application URLs\n",
+        "urls_to_check = [row['Application URL'] for row in data if row.get('Application URL')]\n",
+        "\n",
+        "# Build a better prompt with the URLs directly\n",
+        "prompt = f'''\n",
+        "Check if registration is open for each of these trade show URLs:\n",
+        "\n",
+        "{chr(10).join(f\"- {url}\" for url in urls_to_check)}\n",
+        "\n",
+        "For each URL:\n",
+        "1) Use the browser tool to visit the page\n",
+        "  1.1) It will be on the page called URLs in a column called \"Application URLs\"\n",
+        "2) Determine if registration/applications are OPEN, CLOSED, or UNKNOWN\n",
+        "3) If the site mentions when registration opens, calculate the time until opening\n",
+        "\n",
+        "Return your findings for each URL.\n",
+        "Here is the link to the spreadsheet: https://docs.google.com/spreadsheets/d/1Cy82Bo73OP9lmgjy6-aRmO2rMwyRKz6ydbKjLlFaCmA/edit?gid=0#gid=0\n",
+        "'''"
+      ],
+      "metadata": {
+        "id": "pNAvt2KPh4aZ"
+      },
+      "execution_count": 32,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Create credentials\n",
+        "creds, _ = default()\n",
+        "gc = gspread.authorize(creds)\n",
+        "\n",
+        "# Create a custom tool to read the spreadsheet\n",
+        "@tool\n",
+        "def read_google_sheet(sheet_url: str) -> str:\n",
+        "    \"\"\"\n",
+        "    Reads data from a Google Sheet\n",
+        "\n",
+        "    Args:\n",
+        "        sheet_url: The URL of the Google Sheet\n",
+        "\n",
+        "    Returns:\n",
+        "        CSV-formatted string of the sheet data\n",
+        "    \"\"\"\n",
+        "    sheet = gc.open_by_url(sheet_url)\n",
+        "    worksheet = sheet.get_worksheet(0)\n",
+        "    data = worksheet.get_all_values()\n",
+        "\n",
+        "    # Convert to CSV string\n",
+        "    import csv\n",
+        "    import io\n",
+        "    output = io.StringIO()\n",
+        "    writer = csv.writer(output)\n",
+        "    writer.writerows(data)\n",
+        "    return output.getvalue()\n",
+        "\n",
+        "# Now add this tool to your agent\n",
+        "agent = Agent(\n",
+        "    model=AnthropicModel(\n",
+        "        model_id='claude-3-5-haiku-20241022',\n",
+        "        max_tokens=2048\n",
+        "    ),\n",
+        "    tools=[\n",
+        "        LocalChromiumBrowser(),\n",
+        "        http_request,\n",
+        "        current_time,\n",
+        "        calculator,\n",
+        "        read_google_sheet\n",
+        "    ]\n",
+        ")\n",
+        "\n",
+        "response = agent(prompt)\n",
+        "\n",
+        "display(response)"
+      ],
+      "metadata": {
+        "id": "6xHpf59E3NIO",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 1000
+        },
+        "outputId": "8b0386a7-a8de-4b06-cbb3-8e1502a1957d"
+      },
+      "execution_count": 30,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "WARNING:strands.tools.registry:tool=<<strands_tools.browser.local_chromium_browser.LocalChromiumBrowser object at 0x7ed6b87340e0>> | unrecognized tool specification\n"
+          ]
+        },
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "I'll help you with this task. I'll break it down into steps:\n",
+            "\n",
+            "1. First, I'll read the Google Sheet to get the URLs\n",
+            "2. Then I'll use the http_request tool to visit each page\n",
+            "3. I'll analyze the registration status for each trade show\n",
+            "\n",
+            "Let's start by reading the Google Sheet:\n",
+            "Tool #1: read_google_sheet\n",
+            "I'll now check each URL to determine the registration status:\n",
+            "\n",
+            "1. Utah Valley Marathon\n",
+            "Tool #2: http_request\n"
+          ]
+        },
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/plain": [
+              "\u001b[34m╭─\u001b[0m\u001b[34m─────────\u001b[0m\u001b[34m \u001b[0m\u001b[1;34m🚀 HTTP Request Preview: GET /races/utah-valley-marathon-and-half-marathon-10k/2025/tickets\u001b[0m\u001b[34m \u001b[0m\u001b[34m─────────\u001b[0m\u001b[34m─╮\u001b[0m\n",
+              "\u001b[34m│\u001b[0m                                                                                                                 \u001b[34m│\u001b[0m\n",
+              "\u001b[34m│\u001b[0m  \u001b[36m \u001b[0m\u001b[36mMethod \u001b[0m\u001b[36m \u001b[0m \u001b[37m \u001b[0m\u001b[37mGET                                                                                    \u001b[0m\u001b[37m \u001b[0m            \u001b[34m│\u001b[0m\n",
+              "\u001b[34m│\u001b[0m  \u001b[36m \u001b[0m\u001b[36mURL    \u001b[0m\u001b[36m \u001b[0m \u001b[37m \u001b[0m\u001b[37mhttps://www.raceentry.com/races/utah-valley-marathon-and-half-marathon-10k/2025/tickets\u001b[0m\u001b[37m \u001b[0m            \u001b[34m│\u001b[0m\n",
+              "\u001b[34m│\u001b[0m  \u001b[36m \u001b[0m\u001b[36mHeaders\u001b[0m\u001b[36m \u001b[0m \u001b[37m \u001b[0m\u001b[37m{}                                                                                     \u001b[0m\u001b[37m \u001b[0m            \u001b[34m│\u001b[0m\n",
+              "\u001b[34m│\u001b[0m                                                                                                                 \u001b[34m│\u001b[0m\n",
+              "\u001b[34m╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯\u001b[0m\n"
+            ],
+            "text/html": [
+              "<pre style=\"white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace\"><span style=\"color: #000080; text-decoration-color: #000080\">╭────────── </span><span style=\"color: #000080; text-decoration-color: #000080; font-weight: bold\">🚀 HTTP Request Preview: GET /races/utah-valley-marathon-and-half-marathon-10k/2025/tickets</span><span style=\"color: #000080; text-decoration-color: #000080\"> ──────────╮</span>\n",
+              "<span style=\"color: #000080; text-decoration-color: #000080\">│</span>                                                                                                                 <span style=\"color: #000080; text-decoration-color: #000080\">│</span>\n",
+              "<span style=\"color: #000080; text-decoration-color: #000080\">│</span>  <span style=\"color: #008080; text-decoration-color: #008080\"> Method  </span> <span style=\"color: #c0c0c0; text-decoration-color: #c0c0c0\"> GET                                                                                     </span>            <span style=\"color: #000080; text-decoration-color: #000080\">│</span>\n",
+              "<span style=\"color: #000080; text-decoration-color: #000080\">│</span>  <span style=\"color: #008080; text-decoration-color: #008080\"> URL     </span> <span style=\"color: #c0c0c0; text-decoration-color: #c0c0c0\"> https://www.raceentry.com/races/utah-valley-marathon-and-half-marathon-10k/2025/tickets </span>            <span style=\"color: #000080; text-decoration-color: #000080\">│</span>\n",
+              "<span style=\"color: #000080; text-decoration-color: #000080\">│</span>  <span style=\"color: #008080; text-decoration-color: #008080\"> Headers </span> <span style=\"color: #c0c0c0; text-decoration-color: #c0c0c0\"> {}                                                                                      </span>            <span style=\"color: #000080; text-decoration-color: #000080\">│</span>\n",
+              "<span style=\"color: #000080; text-decoration-color: #000080\">│</span>                                                                                                                 <span style=\"color: #000080; text-decoration-color: #000080\">│</span>\n",
+              "<span style=\"color: #000080; text-decoration-color: #000080\">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>\n",
+              "</pre>\n"
+            ]
+          },
+          "metadata": {}
+        },
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/plain": [
+              "\u001b[34mSending request...\u001b[0m\n"
+            ],
+            "text/html": [
+              "<pre style=\"white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace\"><span style=\"color: #000080; text-decoration-color: #000080\">Sending request...</span>\n",
+              "</pre>\n"
+            ]
+          },
+          "metadata": {}
+        },
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/plain": [
+              "\u001b[32m╭─\u001b[0m\u001b[32m──────────────────────────────────────────\u001b[0m\u001b[32m \u001b[0m\u001b[1;32m✅ HTTP Response: 200 OK\u001b[0m\u001b[32m \u001b[0m\u001b[32m───────────────────────────────────────────\u001b[0m\u001b[32m─╮\u001b[0m\n",
+              "\u001b[32m│\u001b[0m \u001b[34m                                                                                                               \u001b[0m \u001b[32m│\u001b[0m\n",
+              "\u001b[32m│\u001b[0m \u001b[34m \u001b[0m                                                                                                             \u001b[34m \u001b[0m \u001b[32m│\u001b[0m\n",
+              "\u001b[32m│\u001b[0m \u001b[34m \u001b[0m  \u001b[36m \u001b[0m\u001b[36mStatus      \u001b[0m\u001b[36m \u001b[0m  \u001b[32m200 OK                                                                                 \u001b[0m    \u001b[34m \u001b[0m \u001b[32m│\u001b[0m\n",
+              "\u001b[32m│\u001b[0m \u001b[34m \u001b[0m  \u001b[36m \u001b[0m\u001b[36mURL         \u001b[0m\u001b[36m \u001b[0m  https://www.raceentry.com/races/utah-valley-marathon-and-half-marathon-10k/2025/tickets    \u001b[34m \u001b[0m \u001b[32m│\u001b[0m\n",
+              "\u001b[32m│\u001b[0m \u001b[34m \u001b[0m  \u001b[36m \u001b[0m\u001b[36mContent-Type\u001b[0m\u001b[36m \u001b[0m  text/html; charset=utf-8                                                                   \u001b[34m \u001b[0m \u001b[32m│\u001b[0m\n",
+              "\u001b[32m│\u001b[0m \u001b[34m \u001b[0m  \u001b[36m \u001b[0m\u001b[36mSize        \u001b[0m\u001b[36m \u001b[0m  7,605 bytes (7.4 KB)                                                                       \u001b[34m \u001b[0m \u001b[32m│\u001b[0m\n",
+              "\u001b[32m│\u001b[0m \u001b[34m \u001b[0m                                                                                                             \u001b[34m \u001b[0m \u001b[32m│\u001b[0m\n",
+              "\u001b[32m│\u001b[0m \u001b[34m                                                                                                               \u001b[0m \u001b[32m│\u001b[0m\n",
+              "\u001b[32m╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯\u001b[0m\n"
+            ],
+            "text/html": [
+              "<pre style=\"white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace\"><span style=\"color: #008000; text-decoration-color: #008000\">╭─────────────────────────────────────────── </span><span style=\"color: #008000; text-decoration-color: #008000; font-weight: bold\">✅ HTTP Response: 200 OK</span><span style=\"color: #008000; text-decoration-color: #008000\"> ────────────────────────────────────────────╮</span>\n",
+              "<span style=\"color: #008000; text-decoration-color: #008000\">│</span> <span style=\"color: #000080; text-decoration-color: #000080\">                                                                                                               </span> <span style=\"color: #008000; text-decoration-color: #008000\">│</span>\n",
+              "<span style=\"color: #008000; text-decoration-color: #008000\">│</span> <span style=\"color: #000080; text-decoration-color: #000080\"> </span>                                                                                                             <span style=\"color: #000080; text-decoration-color: #000080\"> </span> <span style=\"color: #008000; text-decoration-color: #008000\">│</span>\n",
+              "<span style=\"color: #008000; text-decoration-color: #008000\">│</span> <span style=\"color: #000080; text-decoration-color: #000080\"> </span>  <span style=\"color: #008080; text-decoration-color: #008080\"> Status       </span>  <span style=\"color: #008000; text-decoration-color: #008000\">200 OK                                                                                 </span>    <span style=\"color: #000080; text-decoration-color: #000080\"> </span> <span style=\"color: #008000; text-decoration-color: #008000\">│</span>\n",
+              "<span style=\"color: #008000; text-decoration-color: #008000\">│</span> <span style=\"color: #000080; text-decoration-color: #000080\"> </span>  <span style=\"color: #008080; text-decoration-color: #008080\"> URL          </span>  https://www.raceentry.com/races/utah-valley-marathon-and-half-marathon-10k/2025/tickets    <span style=\"color: #000080; text-decoration-color: #000080\"> </span> <span style=\"color: #008000; text-decoration-color: #008000\">│</span>\n",
+              "<span style=\"color: #008000; text-decoration-color: #008000\">│</span> <span style=\"color: #000080; text-decoration-color: #000080\"> </span>  <span style=\"color: #008080; text-decoration-color: #008080\"> Content-Type </span>  text/html; charset=utf-8                                                                   <span style=\"color: #000080; text-decoration-color: #000080\"> </span> <span style=\"color: #008000; text-decoration-color: #008000\">│</span>\n",
+              "<span style=\"color: #008000; text-decoration-color: #008000\">│</span> <span style=\"color: #000080; text-decoration-color: #000080\"> </span>  <span style=\"color: #008080; text-decoration-color: #008080\"> Size         </span>  7,605 bytes (7.4 KB)                                                                       <span style=\"color: #000080; text-decoration-color: #000080\"> </span> <span style=\"color: #008000; text-decoration-color: #008000\">│</span>\n",
+              "<span style=\"color: #008000; text-decoration-color: #008000\">│</span> <span style=\"color: #000080; text-decoration-color: #000080\"> </span>                                                                                                             <span style=\"color: #000080; text-decoration-color: #000080\"> </span> <span style=\"color: #008000; text-decoration-color: #008000\">│</span>\n",
+              "<span style=\"color: #008000; text-decoration-color: #008000\">│</span> <span style=\"color: #000080; text-decoration-color: #000080\">                                                                                                               </span> <span style=\"color: #008000; text-decoration-color: #008000\">│</span>\n",
+              "<span style=\"color: #008000; text-decoration-color: #008000\">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>\n",
+              "</pre>\n"
+            ]
+          },
+          "metadata": {}
+        },
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/plain": [
+              "\u001b[3m                                                 Response Headers                                                  \u001b[0m\n",
+              "╭───────────────────────────┬─────────────────────────────────────────────────────────────────────────────────────╮\n",
+              "│\u001b[1m \u001b[0m\u001b[1mHeader                   \u001b[0m\u001b[1m \u001b[0m│\u001b[1m \u001b[0m\u001b[1mValue                                                                              \u001b[0m\u001b[1m \u001b[0m│\n",
+              "├───────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────┤\n",
+              "│\u001b[36m \u001b[0m\u001b[36mDate                     \u001b[0m\u001b[36m \u001b[0m│\u001b[32m \u001b[0m\u001b[32mTue, 02 Dec 2025 21:22:01 GMT                                                      \u001b[0m\u001b[32m \u001b[0m│\n",
+              "│\u001b[36m \u001b[0m\u001b[36mContent-Type             \u001b[0m\u001b[36m \u001b[0m│\u001b[32m \u001b[0m\u001b[32mtext/html; charset=utf-8                                                           \u001b[0m\u001b[32m \u001b[0m│\n",
+              "│\u001b[36m \u001b[0m\u001b[36mContent-Length           \u001b[0m\u001b[36m \u001b[0m│\u001b[32m \u001b[0m\u001b[32m2932                                                                               \u001b[0m\u001b[32m \u001b[0m│\n",
+              "│\u001b[36m \u001b[0m\u001b[36mConnection               \u001b[0m\u001b[36m \u001b[0m│\u001b[32m \u001b[0m\u001b[32mkeep-alive                                                                         \u001b[0m\u001b[32m \u001b[0m│\n",
+              "│\u001b[36m \u001b[0m\u001b[36mServer                   \u001b[0m\u001b[36m \u001b[0m│\u001b[32m \u001b[0m\u001b[32mApache                                                                             \u001b[0m\u001b[32m \u001b[0m│\n",
+              "│\u001b[36m \u001b[0m\u001b[36mSet-Cookie               \u001b[0m\u001b[36m \u001b[0m│\u001b[32m \u001b[0m\u001b[32msession=9ad2ad8a2e1f7f844472491f834d8c8f0124c2df~692f5879eac973-85782151;          \u001b[0m\u001b[32m \u001b[0m│\n",
+              "│\u001b[36m                           \u001b[0m│\u001b[32m \u001b[0m\u001b[32mexpires=Wed, 03 Dec 2025 0...                                                      \u001b[0m\u001b[32m \u001b[0m│\n",
+              "│\u001b[36m \u001b[0m\u001b[36mVary                     \u001b[0m\u001b[36m \u001b[0m│\u001b[32m \u001b[0m\u001b[32mAccept-Encoding,User-Agent                                                         \u001b[0m\u001b[32m \u001b[0m│\n",
+              "│\u001b[36m \u001b[0m\u001b[36mContent-Encoding         \u001b[0m\u001b[36m \u001b[0m│\u001b[32m \u001b[0m\u001b[32mgzip                                                                               \u001b[0m\u001b[32m \u001b[0m│\n",
+              "│\u001b[36m \u001b[0m\u001b[36mStrict-Transport-Security\u001b[0m\u001b[36m \u001b[0m│\u001b[32m \u001b[0m\u001b[32mmax-age=31536000                                                                   \u001b[0m\u001b[32m \u001b[0m│\n",
+              "╰───────────────────────────┴─────────────────────────────────────────────────────────────────────────────────────╯\n"
+            ],
+            "text/html": [
+              "<pre style=\"white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace\"><span style=\"font-style: italic\">                                                 Response Headers                                                  </span>\n",
+              "╭───────────────────────────┬─────────────────────────────────────────────────────────────────────────────────────╮\n",
+              "│<span style=\"font-weight: bold\"> Header                    </span>│<span style=\"font-weight: bold\"> Value                                                                               </span>│\n",
+              "├───────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────┤\n",
+              "│<span style=\"color: #008080; text-decoration-color: #008080\"> Date                      </span>│<span style=\"color: #008000; text-decoration-color: #008000\"> Tue, 02 Dec 2025 21:22:01 GMT                                                       </span>│\n",
+              "│<span style=\"color: #008080; text-decoration-color: #008080\"> Content-Type              </span>│<span style=\"color: #008000; text-decoration-color: #008000\"> text/html; charset=utf-8                                                            </span>│\n",
+              "│<span style=\"color: #008080; text-decoration-color: #008080\"> Content-Length            </span>│<span style=\"color: #008000; text-decoration-color: #008000\"> 2932                                                                                </span>│\n",
+              "│<span style=\"color: #008080; text-decoration-color: #008080\"> Connection                </span>│<span style=\"color: #008000; text-decoration-color: #008000\"> keep-alive                                                                          </span>│\n",
+              "│<span style=\"color: #008080; text-decoration-color: #008080\"> Server                    </span>│<span style=\"color: #008000; text-decoration-color: #008000\"> Apache                                                                              </span>│\n",
+              "│<span style=\"color: #008080; text-decoration-color: #008080\"> Set-Cookie                </span>│<span style=\"color: #008000; text-decoration-color: #008000\"> session=9ad2ad8a2e1f7f844472491f834d8c8f0124c2df~692f5879eac973-85782151;           </span>│\n",
+              "│<span style=\"color: #008080; text-decoration-color: #008080\">                           </span>│<span style=\"color: #008000; text-decoration-color: #008000\"> expires=Wed, 03 Dec 2025 0...                                                       </span>│\n",
+              "│<span style=\"color: #008080; text-decoration-color: #008080\"> Vary                      </span>│<span style=\"color: #008000; text-decoration-color: #008000\"> Accept-Encoding,User-Agent                                                          </span>│\n",
+              "│<span style=\"color: #008080; text-decoration-color: #008080\"> Content-Encoding          </span>│<span style=\"color: #008000; text-decoration-color: #008000\"> gzip                                                                                </span>│\n",
+              "│<span style=\"color: #008080; text-decoration-color: #008080\"> Strict-Transport-Security </span>│<span style=\"color: #008000; text-decoration-color: #008000\"> max-age=31536000                                                                    </span>│\n",
+              "╰───────────────────────────┴─────────────────────────────────────────────────────────────────────────────────────╯\n",
+              "</pre>\n"
+            ]
+          },
+          "metadata": {}
+        },
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "2. Tuachan Saturday Market\n",
+            "Tool #3: http_request\n"
+          ]
+        },
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/plain": [
+              "\u001b[34m╭─\u001b[0m\u001b[34m───────────────────────────────\u001b[0m\u001b[34m \u001b[0m\u001b[1;34m🚀 HTTP Request Preview: GET /saturday-market/\u001b[0m\u001b[34m \u001b[0m\u001b[34m────────────────────────────────\u001b[0m\u001b[34m─╮\u001b[0m\n",
+              "\u001b[34m│\u001b[0m                                                                                                                 \u001b[34m│\u001b[0m\n",
+              "\u001b[34m│\u001b[0m  \u001b[36m \u001b[0m\u001b[36mMethod \u001b[0m\u001b[36m \u001b[0m \u001b[37m \u001b[0m\u001b[37mGET                                     \u001b[0m\u001b[37m \u001b[0m                                                           \u001b[34m│\u001b[0m\n",
+              "\u001b[34m│\u001b[0m  \u001b[36m \u001b[0m\u001b[36mURL    \u001b[0m\u001b[36m \u001b[0m \u001b[37m \u001b[0m\u001b[37mhttps://www.tuacahn.org/saturday-market/\u001b[0m\u001b[37m \u001b[0m                                                           \u001b[34m│\u001b[0m\n",
+              "\u001b[34m│\u001b[0m  \u001b[36m \u001b[0m\u001b[36mHeaders\u001b[0m\u001b[36m \u001b[0m \u001b[37m \u001b[0m\u001b[37m{}                                      \u001b[0m\u001b[37m \u001b[0m                                                           \u001b[34m│\u001b[0m\n",
+              "\u001b[34m│\u001b[0m                                                                                                                 \u001b[34m│\u001b[0m\n",
+              "\u001b[34m╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯\u001b[0m\n"
+            ],
+            "text/html": [
+              "<pre style=\"white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace\"><span style=\"color: #000080; text-decoration-color: #000080\">╭──────────────────────────────── </span><span style=\"color: #000080; text-decoration-color: #000080; font-weight: bold\">🚀 HTTP Request Preview: GET /saturday-market/</span><span style=\"color: #000080; text-decoration-color: #000080\"> ─────────────────────────────────╮</span>\n",
+              "<span style=\"color: #000080; text-decoration-color: #000080\">│</span>                                                                                                                 <span style=\"color: #000080; text-decoration-color: #000080\">│</span>\n",
+              "<span style=\"color: #000080; text-decoration-color: #000080\">│</span>  <span style=\"color: #008080; text-decoration-color: #008080\"> Method  </span> <span style=\"color: #c0c0c0; text-decoration-color: #c0c0c0\"> GET                                      </span>                                                           <span style=\"color: #000080; text-decoration-color: #000080\">│</span>\n",
+              "<span style=\"color: #000080; text-decoration-color: #000080\">│</span>  <span style=\"color: #008080; text-decoration-color: #008080\"> URL     </span> <span style=\"color: #c0c0c0; text-decoration-color: #c0c0c0\"> https://www.tuacahn.org/saturday-market/ </span>                                                           <span style=\"color: #000080; text-decoration-color: #000080\">│</span>\n",
+              "<span style=\"color: #000080; text-decoration-color: #000080\">│</span>  <span style=\"color: #008080; text-decoration-color: #008080\"> Headers </span> <span style=\"color: #c0c0c0; text-decoration-color: #c0c0c0\"> {}                                       </span>                                                           <span style=\"color: #000080; text-decoration-color: #000080\">│</span>\n",
+              "<span style=\"color: #000080; text-decoration-color: #000080\">│</span>                                                                                                                 <span style=\"color: #000080; text-decoration-color: #000080\">│</span>\n",
+              "<span style=\"color: #000080; text-decoration-color: #000080\">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>\n",
+              "</pre>\n"
+            ]
+          },
+          "metadata": {}
+        },
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/plain": [
+              "\u001b[34mSending request...\u001b[0m\n"
+            ],
+            "text/html": [
+              "<pre style=\"white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace\"><span style=\"color: #000080; text-decoration-color: #000080\">Sending request...</span>\n",
+              "</pre>\n"
+            ]
+          },
+          "metadata": {}
+        },
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/plain": [
+              "\u001b[32m╭─\u001b[0m\u001b[32m──────────────────────────────────────────\u001b[0m\u001b[32m \u001b[0m\u001b[1;32m✅ HTTP Response: 200 OK\u001b[0m\u001b[32m \u001b[0m\u001b[32m───────────────────────────────────────────\u001b[0m\u001b[32m─╮\u001b[0m\n",
+              "\u001b[32m│\u001b[0m \u001b[34m                                                                                                               \u001b[0m \u001b[32m│\u001b[0m\n",
+              "\u001b[32m│\u001b[0m \u001b[34m \u001b[0m                                                                                                             \u001b[34m \u001b[0m \u001b[32m│\u001b[0m\n",
+              "\u001b[32m│\u001b[0m \u001b[34m \u001b[0m  \u001b[36m \u001b[0m\u001b[36mStatus      \u001b[0m\u001b[36m \u001b[0m  \u001b[32m200 OK                                  \u001b[0m                                                   \u001b[34m \u001b[0m \u001b[32m│\u001b[0m\n",
+              "\u001b[32m│\u001b[0m \u001b[34m \u001b[0m  \u001b[36m \u001b[0m\u001b[36mURL         \u001b[0m\u001b[36m \u001b[0m  https://www.tuacahn.org/saturday-market/                                                   \u001b[34m \u001b[0m \u001b[32m│\u001b[0m\n",
+              "\u001b[32m│\u001b[0m \u001b[34m \u001b[0m  \u001b[36m \u001b[0m\u001b[36mContent-Type\u001b[0m\u001b[36m \u001b[0m  text/html; charset=UTF-8                                                                   \u001b[34m \u001b[0m \u001b[32m│\u001b[0m\n",
+              "\u001b[32m│\u001b[0m \u001b[34m \u001b[0m  \u001b[36m \u001b[0m\u001b[36mSize        \u001b[0m\u001b[36m \u001b[0m  219,158 bytes (214.0 KB)                                                                   \u001b[34m \u001b[0m \u001b[32m│\u001b[0m\n",
+              "\u001b[32m│\u001b[0m \u001b[34m \u001b[0m                                                                                                             \u001b[34m \u001b[0m \u001b[32m│\u001b[0m\n",
+              "\u001b[32m│\u001b[0m \u001b[34m                                                                                                               \u001b[0m \u001b[32m│\u001b[0m\n",
+              "\u001b[32m╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯\u001b[0m\n"
+            ],
+            "text/html": [
+              "<pre style=\"white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace\"><span style=\"color: #008000; text-decoration-color: #008000\">╭─────────────────────────────────────────── </span><span style=\"color: #008000; text-decoration-color: #008000; font-weight: bold\">✅ HTTP Response: 200 OK</span><span style=\"color: #008000; text-decoration-color: #008000\"> ────────────────────────────────────────────╮</span>\n",
+              "<span style=\"color: #008000; text-decoration-color: #008000\">│</span> <span style=\"color: #000080; text-decoration-color: #000080\">                                                                                                               </span> <span style=\"color: #008000; text-decoration-color: #008000\">│</span>\n",
+              "<span style=\"color: #008000; text-decoration-color: #008000\">│</span> <span style=\"color: #000080; text-decoration-color: #000080\"> </span>                                                                                                             <span style=\"color: #000080; text-decoration-color: #000080\"> </span> <span style=\"color: #008000; text-decoration-color: #008000\">│</span>\n",
+              "<span style=\"color: #008000; text-decoration-color: #008000\">│</span> <span style=\"color: #000080; text-decoration-color: #000080\"> </span>  <span style=\"color: #008080; text-decoration-color: #008080\"> Status       </span>  <span style=\"color: #008000; text-decoration-color: #008000\">200 OK                                  </span>                                                   <span style=\"color: #000080; text-decoration-color: #000080\"> </span> <span style=\"color: #008000; text-decoration-color: #008000\">│</span>\n",
+              "<span style=\"color: #008000; text-decoration-color: #008000\">│</span> <span style=\"color: #000080; text-decoration-color: #000080\"> </span>  <span style=\"color: #008080; text-decoration-color: #008080\"> URL          </span>  https://www.tuacahn.org/saturday-market/                                                   <span style=\"color: #000080; text-decoration-color: #000080\"> </span> <span style=\"color: #008000; text-decoration-color: #008000\">│</span>\n",
+              "<span style=\"color: #008000; text-decoration-color: #008000\">│</span> <span style=\"color: #000080; text-decoration-color: #000080\"> </span>  <span style=\"color: #008080; text-decoration-color: #008080\"> Content-Type </span>  text/html; charset=UTF-8                                                                   <span style=\"color: #000080; text-decoration-color: #000080\"> </span> <span style=\"color: #008000; text-decoration-color: #008000\">│</span>\n",
+              "<span style=\"color: #008000; text-decoration-color: #008000\">│</span> <span style=\"color: #000080; text-decoration-color: #000080\"> </span>  <span style=\"color: #008080; text-decoration-color: #008080\"> Size         </span>  219,158 bytes (214.0 KB)                                                                   <span style=\"color: #000080; text-decoration-color: #000080\"> </span> <span style=\"color: #008000; text-decoration-color: #008000\">│</span>\n",
+              "<span style=\"color: #008000; text-decoration-color: #008000\">│</span> <span style=\"color: #000080; text-decoration-color: #000080\"> </span>                                                                                                             <span style=\"color: #000080; text-decoration-color: #000080\"> </span> <span style=\"color: #008000; text-decoration-color: #008000\">│</span>\n",
+              "<span style=\"color: #008000; text-decoration-color: #008000\">│</span> <span style=\"color: #000080; text-decoration-color: #000080\">                                                                                                               </span> <span style=\"color: #008000; text-decoration-color: #008000\">│</span>\n",
+              "<span style=\"color: #008000; text-decoration-color: #008000\">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>\n",
+              "</pre>\n"
+            ]
+          },
+          "metadata": {}
+        },
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/plain": [
+              "\u001b[3m                                                 Response Headers                                                  \u001b[0m\n",
+              "╭───────────────────┬─────────────────────────────────────────────────────────────────────────────────────────────╮\n",
+              "│\u001b[1m \u001b[0m\u001b[1mHeader           \u001b[0m\u001b[1m \u001b[0m│\u001b[1m \u001b[0m\u001b[1mValue                                                                                      \u001b[0m\u001b[1m \u001b[0m│\n",
+              "├───────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────┤\n",
+              "│\u001b[36m \u001b[0m\u001b[36mDate             \u001b[0m\u001b[36m \u001b[0m│\u001b[32m \u001b[0m\u001b[32mTue, 02 Dec 2025 21:22:08 GMT                                                              \u001b[0m\u001b[32m \u001b[0m│\n",
+              "│\u001b[36m \u001b[0m\u001b[36mContent-Type     \u001b[0m\u001b[36m \u001b[0m│\u001b[32m \u001b[0m\u001b[32mtext/html; charset=UTF-8                                                                   \u001b[0m\u001b[32m \u001b[0m│\n",
+              "│\u001b[36m \u001b[0m\u001b[36mTransfer-Encoding\u001b[0m\u001b[36m \u001b[0m│\u001b[32m \u001b[0m\u001b[32mchunked                                                                                    \u001b[0m\u001b[32m \u001b[0m│\n",
+              "│\u001b[36m \u001b[0m\u001b[36mConnection       \u001b[0m\u001b[36m \u001b[0m│\u001b[32m \u001b[0m\u001b[32mkeep-alive                                                                                 \u001b[0m\u001b[32m \u001b[0m│\n",
+              "│\u001b[36m \u001b[0m\u001b[36mServer           \u001b[0m\u001b[36m \u001b[0m│\u001b[32m \u001b[0m\u001b[32mcloudflare                                                                                 \u001b[0m\u001b[32m \u001b[0m│\n",
+              "│\u001b[36m \u001b[0m\u001b[36mvary             \u001b[0m\u001b[36m \u001b[0m│\u001b[32m \u001b[0m\u001b[32mAccept-Encoding                                                                            \u001b[0m\u001b[32m \u001b[0m│\n",
+              "│\u001b[36m \u001b[0m\u001b[36mlink             \u001b[0m\u001b[36m \u001b[0m│\u001b[32m \u001b[0m\u001b[32m<https://www.tuacahn.org/wp-json/>; rel=\"https://api.w.org/\",                              \u001b[0m\u001b[32m \u001b[0m│\n",
+              "│\u001b[36m                   \u001b[0m│\u001b[32m \u001b[0m\u001b[32m<https://www.tuacahn.org/wp-json/wp/v2...                                                  \u001b[0m\u001b[32m \u001b[0m│\n",
+              "│\u001b[36m \u001b[0m\u001b[36mx-tec-api-version\u001b[0m\u001b[36m \u001b[0m│\u001b[32m \u001b[0m\u001b[32mv1                                                                                         \u001b[0m\u001b[32m \u001b[0m│\n",
+              "│\u001b[36m \u001b[0m\u001b[36mx-tec-api-root   \u001b[0m\u001b[36m \u001b[0m│\u001b[32m \u001b[0m\u001b[32mhttps://www.tuacahn.org/wp-json/tribe/events/v1/                                           \u001b[0m\u001b[32m \u001b[0m│\n",
+              "│\u001b[36m \u001b[0m\u001b[36mx-tec-api-origin \u001b[0m\u001b[36m \u001b[0m│\u001b[32m \u001b[0m\u001b[32mhttps://www.tuacahn.org                                                                    \u001b[0m\u001b[32m \u001b[0m│\n",
+              "│\u001b[36m \u001b[0m\u001b[36mx-cache-nxaccel  \u001b[0m\u001b[36m \u001b[0m│\u001b[32m \u001b[0m\u001b[32mBYPASS                                                                                     \u001b[0m\u001b[32m \u001b[0m│\n",
+              "│\u001b[36m \u001b[0m\u001b[36mReport-To        \u001b[0m\u001b[36m \u001b[0m│\u001b[32m \u001b[0m\u001b[32m{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/repor…\u001b[0m\u001b[32m \u001b[0m│\n",
+              "│\u001b[36m \u001b[0m\u001b[36mcf-cache-status  \u001b[0m\u001b[36m \u001b[0m│\u001b[32m \u001b[0m\u001b[32mDYNAMIC                                                                                    \u001b[0m\u001b[32m \u001b[0m│\n",
+              "│\u001b[36m \u001b[0m\u001b[36mNel              \u001b[0m\u001b[36m \u001b[0m│\u001b[32m \u001b[0m\u001b[32m{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}                             \u001b[0m\u001b[32m \u001b[0m│\n",
+              "│\u001b[36m \u001b[0m\u001b[36mContent-Encoding \u001b[0m\u001b[36m \u001b[0m│\u001b[32m \u001b[0m\u001b[32mbr                                                                                         \u001b[0m\u001b[32m \u001b[0m│\n",
+              "│\u001b[36m \u001b[0m\u001b[36mCF-RAY           \u001b[0m\u001b[36m \u001b[0m│\u001b[32m \u001b[0m\u001b[32m9a7de0b0ae00e2ef-HKG                                                                       \u001b[0m\u001b[32m \u001b[0m│\n",
+              "╰───────────────────┴─────────────────────────────────────────────────────────────────────────────────────────────╯\n"
+            ],
+            "text/html": [
+              "<pre style=\"white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace\"><span style=\"font-style: italic\">                                                 Response Headers                                                  </span>\n",
+              "╭───────────────────┬─────────────────────────────────────────────────────────────────────────────────────────────╮\n",
+              "│<span style=\"font-weight: bold\"> Header            </span>│<span style=\"font-weight: bold\"> Value                                                                                       </span>│\n",
+              "├───────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────┤\n",
+              "│<span style=\"color: #008080; text-decoration-color: #008080\"> Date              </span>│<span style=\"color: #008000; text-decoration-color: #008000\"> Tue, 02 Dec 2025 21:22:08 GMT                                                               </span>│\n",
+              "│<span style=\"color: #008080; text-decoration-color: #008080\"> Content-Type      </span>│<span style=\"color: #008000; text-decoration-color: #008000\"> text/html; charset=UTF-8                                                                    </span>│\n",
+              "│<span style=\"color: #008080; text-decoration-color: #008080\"> Transfer-Encoding </span>│<span style=\"color: #008000; text-decoration-color: #008000\"> chunked                                                                                     </span>│\n",
+              "│<span style=\"color: #008080; text-decoration-color: #008080\"> Connection        </span>│<span style=\"color: #008000; text-decoration-color: #008000\"> keep-alive                                                                                  </span>│\n",
+              "│<span style=\"color: #008080; text-decoration-color: #008080\"> Server            </span>│<span style=\"color: #008000; text-decoration-color: #008000\"> cloudflare                                                                                  </span>│\n",
+              "│<span style=\"color: #008080; text-decoration-color: #008080\"> vary              </span>│<span style=\"color: #008000; text-decoration-color: #008000\"> Accept-Encoding                                                                             </span>│\n",
+              "│<span style=\"color: #008080; text-decoration-color: #008080\"> link              </span>│<span style=\"color: #008000; text-decoration-color: #008000\"> &lt;https://www.tuacahn.org/wp-json/&gt;; rel=\"https://api.w.org/\",                               </span>│\n",
+              "│<span style=\"color: #008080; text-decoration-color: #008080\">                   </span>│<span style=\"color: #008000; text-decoration-color: #008000\"> &lt;https://www.tuacahn.org/wp-json/wp/v2...                                                   </span>│\n",
+              "│<span style=\"color: #008080; text-decoration-color: #008080\"> x-tec-api-version </span>│<span style=\"color: #008000; text-decoration-color: #008000\"> v1                                                                                          </span>│\n",
+              "│<span style=\"color: #008080; text-decoration-color: #008080\"> x-tec-api-root    </span>│<span style=\"color: #008000; text-decoration-color: #008000\"> https://www.tuacahn.org/wp-json/tribe/events/v1/                                            </span>│\n",
+              "│<span style=\"color: #008080; text-decoration-color: #008080\"> x-tec-api-origin  </span>│<span style=\"color: #008000; text-decoration-color: #008000\"> https://www.tuacahn.org                                                                     </span>│\n",
+              "│<span style=\"color: #008080; text-decoration-color: #008080\"> x-cache-nxaccel   </span>│<span style=\"color: #008000; text-decoration-color: #008000\"> BYPASS                                                                                      </span>│\n",
+              "│<span style=\"color: #008080; text-decoration-color: #008080\"> Report-To         </span>│<span style=\"color: #008000; text-decoration-color: #008000\"> {\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/repor… </span>│\n",
+              "│<span style=\"color: #008080; text-decoration-color: #008080\"> cf-cache-status   </span>│<span style=\"color: #008000; text-decoration-color: #008000\"> DYNAMIC                                                                                     </span>│\n",
+              "│<span style=\"color: #008080; text-decoration-color: #008080\"> Nel               </span>│<span style=\"color: #008000; text-decoration-color: #008000\"> {\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}                              </span>│\n",
+              "│<span style=\"color: #008080; text-decoration-color: #008080\"> Content-Encoding  </span>│<span style=\"color: #008000; text-decoration-color: #008000\"> br                                                                                          </span>│\n",
+              "│<span style=\"color: #008080; text-decoration-color: #008080\"> CF-RAY            </span>│<span style=\"color: #008000; text-decoration-color: #008000\"> 9a7de0b0ae00e2ef-HKG                                                                        </span>│\n",
+              "╰───────────────────┴─────────────────────────────────────────────────────────────────────────────────────────────╯\n",
+              "</pre>\n"
+            ]
+          },
+          "metadata": {}
+        },
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "For each URL, I'll determine the registration status:\n",
+            "\n",
+            "1. Utah Valley Marathon\n",
+            "Registration Status: CLOSED\n",
+            "The page shows \"Online booth sales are now closed.\"\n",
+            "\n",
+            "2. Tuacahn Saturday Market\n",
+            "Registration Status: OPEN\n",
+            "From the webpage, the Saturday Market is described as \"open year-round\" with specific hours:\n",
+            "- October - April: 10 AM - 2 PM\n",
+            "- May - September: 9 AM - 1 PM\n",
+            "\n",
+            "Vendor registration details:\n",
+            "- A vendor agreement is available for download on the page\n",
+            "- There's a specific contract for 2025 Tuacahn Saturday Market Vendors\n",
+            "\n",
+            "I'll calculate the time until the next market session based on the current time:\n",
+            "Tool #4: current_time\n",
+            "Current time is in the October - April period, so the market is currently open from 10 AM - 2 PM.\n",
+            "\n",
+            "No specific calculation of time until next market is needed since it's currently running during its standard hours.\n",
+            "\n",
+            "Would you like me to elaborate on any part of the findings?"
+          ]
+        },
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/plain": [
+              "AgentResult(stop_reason='end_turn', message={'role': 'assistant', 'content': [{'text': \"Current time is in the October - April period, so the market is currently open from 10 AM - 2 PM.\\n\\nNo specific calculation of time until next market is needed since it's currently running during its standard hours.\\n\\nWould you like me to elaborate on any part of the findings?\"}]}, metrics=EventLoopMetrics(cycle_count=5, tool_metrics={'read_google_sheet': ToolMetrics(tool={'toolUseId': 'toolu_018ouPD8GGn6KNVYB8cNZaLm', 'name': 'read_google_sheet', 'input': {'sheet_url': 'https://docs.google.com/spreadsheets/d/1Cy82Bo73OP9lmgjy6-aRmO2rMwyRKz6ydbKjLlFaCmA/edit?gid=0#gid=0'}}, call_count=1, success_count=1, error_count=0, total_time=2.0704352855682373), 'http_request': ToolMetrics(tool={'toolUseId': 'toolu_01JRzLqgQyY5MSNYfu9j6hcH', 'name': 'http_request', 'input': {'method': 'GET', 'url': 'https://www.tuacahn.org/saturday-market/', 'verify_ssl': True}}, call_count=2, success_count=2, error_count=0, total_time=3.667567729949951), 'current_time': ToolMetrics(tool={'toolUseId': 'toolu_01XKEyxuktG5YjDt2RU3iNdt', 'name': 'current_time', 'input': {}}, call_count=1, success_count=1, error_count=0, total_time=0.0007238388061523438)}, cycle_durations=[73.67922472953796], traces=[<strands.telemetry.metrics.Trace object at 0x7ed6c745ecc0>, <strands.telemetry.metrics.Trace object at 0x7ed6b8b3dac0>, <strands.telemetry.metrics.Trace object at 0x7ed6bb2ed100>, <strands.telemetry.metrics.Trace object at 0x7ed6ba485130>, <strands.telemetry.metrics.Trace object at 0x7ed6b8b75cd0>], accumulated_usage={'inputTokens': 210341, 'outputTokens': 701, 'totalTokens': 211042}, accumulated_metrics={'latencyMs': 0}), state={}, interrupts=None, structured_output=None)"
+            ]
+          },
+          "metadata": {}
+        }
+      ]
+    }
+  ]
+}

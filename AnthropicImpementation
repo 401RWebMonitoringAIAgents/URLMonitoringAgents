@@ -1,0 +1,281 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": []
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "code",
+      "execution_count": 48,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "v1R0Bagdf3uJ",
+        "outputId": "66b56e35-88e8-49f9-a2c3-2621c8917b7f"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Requirement already satisfied: strands-agents in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 1)) (1.18.0)\n",
+            "Requirement already satisfied: strands-agents-tools in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 2)) (0.2.16)\n",
+            "Requirement already satisfied: google-auth-oauthlib in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 4)) (1.2.2)\n",
+            "Requirement already satisfied: google-auth-httplib2 in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 5)) (0.2.1)\n",
+            "Requirement already satisfied: google-api-python-client in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 6)) (2.187.0)\n",
+            "Requirement already satisfied: gspread in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 7)) (6.2.1)\n",
+            "Requirement already satisfied: boto3<2.0.0,>=1.26.0 in /usr/local/lib/python3.12/dist-packages (from strands-agents->-r requirements.txt (line 1)) (1.42.0)\n",
+            "Requirement already satisfied: botocore<2.0.0,>=1.29.0 in /usr/local/lib/python3.12/dist-packages (from strands-agents->-r requirements.txt (line 1)) (1.41.6)\n",
+            "Requirement already satisfied: docstring-parser<1.0,>=0.15 in /usr/local/lib/python3.12/dist-packages (from strands-agents->-r requirements.txt (line 1)) (0.17.0)\n",
+            "Requirement already satisfied: jsonschema<5.0.0,>=4.0.0 in /usr/local/lib/python3.12/dist-packages (from strands-agents->-r requirements.txt (line 1)) (4.25.1)\n",
+            "Requirement already satisfied: mcp<2.0.0,>=1.11.0 in /usr/local/lib/python3.12/dist-packages (from strands-agents->-r requirements.txt (line 1)) (1.22.0)\n",
+            "Requirement already satisfied: opentelemetry-api<2.0.0,>=1.30.0 in /usr/local/lib/python3.12/dist-packages (from strands-agents->-r requirements.txt (line 1)) (1.38.0)\n",
+            "Requirement already satisfied: opentelemetry-instrumentation-threading<1.00b0,>=0.51b0 in /usr/local/lib/python3.12/dist-packages (from strands-agents->-r requirements.txt (line 1)) (0.59b0)\n",
+            "Requirement already satisfied: opentelemetry-sdk<2.0.0,>=1.30.0 in /usr/local/lib/python3.12/dist-packages (from strands-agents->-r requirements.txt (line 1)) (1.38.0)\n",
+            "Requirement already satisfied: pydantic<3.0.0,>=2.4.0 in /usr/local/lib/python3.12/dist-packages (from strands-agents->-r requirements.txt (line 1)) (2.12.3)\n",
+            "Requirement already satisfied: typing-extensions<5.0.0,>=4.13.2 in /usr/local/lib/python3.12/dist-packages (from strands-agents->-r requirements.txt (line 1)) (4.15.0)\n",
+            "Requirement already satisfied: watchdog<7.0.0,>=6.0.0 in /usr/local/lib/python3.12/dist-packages (from strands-agents->-r requirements.txt (line 1)) (6.0.0)\n",
+            "Requirement already satisfied: aiohttp<4.0.0,>=3.8.0 in /usr/local/lib/python3.12/dist-packages (from strands-agents-tools->-r requirements.txt (line 2)) (3.13.2)\n",
+            "Requirement already satisfied: aws-requests-auth<0.5.0,>=0.4.3 in /usr/local/lib/python3.12/dist-packages (from strands-agents-tools->-r requirements.txt (line 2)) (0.4.3)\n",
+            "Requirement already satisfied: dill<0.5.0,>=0.4.0 in /usr/local/lib/python3.12/dist-packages (from strands-agents-tools->-r requirements.txt (line 2)) (0.4.0)\n",
+            "Requirement already satisfied: markdownify<2.0.0,>=1.0.0 in /usr/local/lib/python3.12/dist-packages (from strands-agents-tools->-r requirements.txt (line 2)) (1.2.2)\n",
+            "Requirement already satisfied: pillow<12.0.0,>=11.2.1 in /usr/local/lib/python3.12/dist-packages (from strands-agents-tools->-r requirements.txt (line 2)) (11.3.0)\n",
+            "Requirement already satisfied: prompt-toolkit<4.0.0,>=3.0.51 in /usr/local/lib/python3.12/dist-packages (from strands-agents-tools->-r requirements.txt (line 2)) (3.0.52)\n",
+            "Requirement already satisfied: pyjwt<3.0.0,>=2.10.1 in /usr/local/lib/python3.12/dist-packages (from strands-agents-tools->-r requirements.txt (line 2)) (2.10.1)\n",
+            "Requirement already satisfied: requests<3.0.0,>=2.28.0 in /usr/local/lib/python3.12/dist-packages (from strands-agents-tools->-r requirements.txt (line 2)) (2.32.4)\n",
+            "Requirement already satisfied: rich<15.0.0,>=14.0.0 in /usr/local/lib/python3.12/dist-packages (from strands-agents-tools->-r requirements.txt (line 2)) (14.2.0)\n",
+            "Requirement already satisfied: slack-bolt<2.0.0,>=1.23.0 in /usr/local/lib/python3.12/dist-packages (from strands-agents-tools->-r requirements.txt (line 2)) (1.27.0)\n",
+            "Requirement already satisfied: sympy<2.0.0,>=1.12.0 in /usr/local/lib/python3.12/dist-packages (from strands-agents-tools->-r requirements.txt (line 2)) (1.14.0)\n",
+            "Requirement already satisfied: tenacity<10.0.0,>=9.1.2 in /usr/local/lib/python3.12/dist-packages (from strands-agents-tools->-r requirements.txt (line 2)) (9.1.2)\n",
+            "Requirement already satisfied: anthropic<1.0.0,>=0.21.0 in /usr/local/lib/python3.12/dist-packages (from strands-agents[anthropic]->-r requirements.txt (line 3)) (0.75.0)\n",
+            "Requirement already satisfied: google-auth>=2.15.0 in /usr/local/lib/python3.12/dist-packages (from google-auth-oauthlib->-r requirements.txt (line 4)) (2.43.0)\n",
+            "Requirement already satisfied: requests-oauthlib>=0.7.0 in /usr/local/lib/python3.12/dist-packages (from google-auth-oauthlib->-r requirements.txt (line 4)) (2.0.0)\n",
+            "Requirement already satisfied: httplib2<1.0.0,>=0.19.0 in /usr/local/lib/python3.12/dist-packages (from google-auth-httplib2->-r requirements.txt (line 5)) (0.31.0)\n",
+            "Requirement already satisfied: google-api-core!=2.0.*,!=2.1.*,!=2.2.*,!=2.3.0,<3.0.0,>=1.31.5 in /usr/local/lib/python3.12/dist-packages (from google-api-python-client->-r requirements.txt (line 6)) (2.28.1)\n",
+            "Requirement already satisfied: uritemplate<5,>=3.0.1 in /usr/local/lib/python3.12/dist-packages (from google-api-python-client->-r requirements.txt (line 6)) (4.2.0)\n",
+            "Requirement already satisfied: aiohappyeyeballs>=2.5.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp<4.0.0,>=3.8.0->strands-agents-tools->-r requirements.txt (line 2)) (2.6.1)\n",
+            "Requirement already satisfied: aiosignal>=1.4.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp<4.0.0,>=3.8.0->strands-agents-tools->-r requirements.txt (line 2)) (1.4.0)\n",
+            "Requirement already satisfied: attrs>=17.3.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp<4.0.0,>=3.8.0->strands-agents-tools->-r requirements.txt (line 2)) (25.4.0)\n",
+            "Requirement already satisfied: frozenlist>=1.1.1 in /usr/local/lib/python3.12/dist-packages (from aiohttp<4.0.0,>=3.8.0->strands-agents-tools->-r requirements.txt (line 2)) (1.8.0)\n",
+            "Requirement already satisfied: multidict<7.0,>=4.5 in /usr/local/lib/python3.12/dist-packages (from aiohttp<4.0.0,>=3.8.0->strands-agents-tools->-r requirements.txt (line 2)) (6.7.0)\n",
+            "Requirement already satisfied: propcache>=0.2.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp<4.0.0,>=3.8.0->strands-agents-tools->-r requirements.txt (line 2)) (0.4.1)\n",
+            "Requirement already satisfied: yarl<2.0,>=1.17.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp<4.0.0,>=3.8.0->strands-agents-tools->-r requirements.txt (line 2)) (1.22.0)\n",
+            "Requirement already satisfied: anyio<5,>=3.5.0 in /usr/local/lib/python3.12/dist-packages (from anthropic<1.0.0,>=0.21.0->strands-agents[anthropic]->-r requirements.txt (line 3)) (4.11.0)\n",
+            "Requirement already satisfied: distro<2,>=1.7.0 in /usr/local/lib/python3.12/dist-packages (from anthropic<1.0.0,>=0.21.0->strands-agents[anthropic]->-r requirements.txt (line 3)) (1.9.0)\n",
+            "Requirement already satisfied: httpx<1,>=0.25.0 in /usr/local/lib/python3.12/dist-packages (from anthropic<1.0.0,>=0.21.0->strands-agents[anthropic]->-r requirements.txt (line 3)) (0.28.1)\n",
+            "Requirement already satisfied: jiter<1,>=0.4.0 in /usr/local/lib/python3.12/dist-packages (from anthropic<1.0.0,>=0.21.0->strands-agents[anthropic]->-r requirements.txt (line 3)) (0.12.0)\n",
+            "Requirement already satisfied: sniffio in /usr/local/lib/python3.12/dist-packages (from anthropic<1.0.0,>=0.21.0->strands-agents[anthropic]->-r requirements.txt (line 3)) (1.3.1)\n",
+            "Requirement already satisfied: jmespath<2.0.0,>=0.7.1 in /usr/local/lib/python3.12/dist-packages (from boto3<2.0.0,>=1.26.0->strands-agents->-r requirements.txt (line 1)) (1.0.1)\n",
+            "Requirement already satisfied: s3transfer<0.17.0,>=0.16.0 in /usr/local/lib/python3.12/dist-packages (from boto3<2.0.0,>=1.26.0->strands-agents->-r requirements.txt (line 1)) (0.16.0)\n",
+            "Requirement already satisfied: python-dateutil<3.0.0,>=2.1 in /usr/local/lib/python3.12/dist-packages (from botocore<2.0.0,>=1.29.0->strands-agents->-r requirements.txt (line 1)) (2.9.0.post0)\n",
+            "Requirement already satisfied: urllib3!=2.2.0,<3,>=1.25.4 in /usr/local/lib/python3.12/dist-packages (from botocore<2.0.0,>=1.29.0->strands-agents->-r requirements.txt (line 1)) (2.5.0)\n",
+            "Requirement already satisfied: googleapis-common-protos<2.0.0,>=1.56.2 in /usr/local/lib/python3.12/dist-packages (from google-api-core!=2.0.*,!=2.1.*,!=2.2.*,!=2.3.0,<3.0.0,>=1.31.5->google-api-python-client->-r requirements.txt (line 6)) (1.72.0)\n",
+            "Requirement already satisfied: protobuf!=3.20.0,!=3.20.1,!=4.21.0,!=4.21.1,!=4.21.2,!=4.21.3,!=4.21.4,!=4.21.5,<7.0.0,>=3.19.5 in /usr/local/lib/python3.12/dist-packages (from google-api-core!=2.0.*,!=2.1.*,!=2.2.*,!=2.3.0,<3.0.0,>=1.31.5->google-api-python-client->-r requirements.txt (line 6)) (5.29.5)\n",
+            "Requirement already satisfied: proto-plus<2.0.0,>=1.22.3 in /usr/local/lib/python3.12/dist-packages (from google-api-core!=2.0.*,!=2.1.*,!=2.2.*,!=2.3.0,<3.0.0,>=1.31.5->google-api-python-client->-r requirements.txt (line 6)) (1.26.1)\n",
+            "Requirement already satisfied: cachetools<7.0,>=2.0.0 in /usr/local/lib/python3.12/dist-packages (from google-auth>=2.15.0->google-auth-oauthlib->-r requirements.txt (line 4)) (6.2.2)\n",
+            "Requirement already satisfied: pyasn1-modules>=0.2.1 in /usr/local/lib/python3.12/dist-packages (from google-auth>=2.15.0->google-auth-oauthlib->-r requirements.txt (line 4)) (0.4.2)\n",
+            "Requirement already satisfied: rsa<5,>=3.1.4 in /usr/local/lib/python3.12/dist-packages (from google-auth>=2.15.0->google-auth-oauthlib->-r requirements.txt (line 4)) (4.9.1)\n",
+            "Requirement already satisfied: pyparsing<4,>=3.0.4 in /usr/local/lib/python3.12/dist-packages (from httplib2<1.0.0,>=0.19.0->google-auth-httplib2->-r requirements.txt (line 5)) (3.2.5)\n",
+            "Requirement already satisfied: jsonschema-specifications>=2023.03.6 in /usr/local/lib/python3.12/dist-packages (from jsonschema<5.0.0,>=4.0.0->strands-agents->-r requirements.txt (line 1)) (2025.9.1)\n",
+            "Requirement already satisfied: referencing>=0.28.4 in /usr/local/lib/python3.12/dist-packages (from jsonschema<5.0.0,>=4.0.0->strands-agents->-r requirements.txt (line 1)) (0.37.0)\n",
+            "Requirement already satisfied: rpds-py>=0.7.1 in /usr/local/lib/python3.12/dist-packages (from jsonschema<5.0.0,>=4.0.0->strands-agents->-r requirements.txt (line 1)) (0.29.0)\n",
+            "Requirement already satisfied: beautifulsoup4<5,>=4.9 in /usr/local/lib/python3.12/dist-packages (from markdownify<2.0.0,>=1.0.0->strands-agents-tools->-r requirements.txt (line 2)) (4.13.5)\n",
+            "Requirement already satisfied: six<2,>=1.15 in /usr/local/lib/python3.12/dist-packages (from markdownify<2.0.0,>=1.0.0->strands-agents-tools->-r requirements.txt (line 2)) (1.17.0)\n",
+            "Requirement already satisfied: httpx-sse>=0.4 in /usr/local/lib/python3.12/dist-packages (from mcp<2.0.0,>=1.11.0->strands-agents->-r requirements.txt (line 1)) (0.4.3)\n",
+            "Requirement already satisfied: pydantic-settings>=2.5.2 in /usr/local/lib/python3.12/dist-packages (from mcp<2.0.0,>=1.11.0->strands-agents->-r requirements.txt (line 1)) (2.12.0)\n",
+            "Requirement already satisfied: python-multipart>=0.0.9 in /usr/local/lib/python3.12/dist-packages (from mcp<2.0.0,>=1.11.0->strands-agents->-r requirements.txt (line 1)) (0.0.20)\n",
+            "Requirement already satisfied: sse-starlette>=1.6.1 in /usr/local/lib/python3.12/dist-packages (from mcp<2.0.0,>=1.11.0->strands-agents->-r requirements.txt (line 1)) (3.0.3)\n",
+            "Requirement already satisfied: starlette>=0.27 in /usr/local/lib/python3.12/dist-packages (from mcp<2.0.0,>=1.11.0->strands-agents->-r requirements.txt (line 1)) (0.48.0)\n",
+            "Requirement already satisfied: typing-inspection>=0.4.1 in /usr/local/lib/python3.12/dist-packages (from mcp<2.0.0,>=1.11.0->strands-agents->-r requirements.txt (line 1)) (0.4.2)\n",
+            "Requirement already satisfied: uvicorn>=0.31.1 in /usr/local/lib/python3.12/dist-packages (from mcp<2.0.0,>=1.11.0->strands-agents->-r requirements.txt (line 1)) (0.38.0)\n",
+            "Requirement already satisfied: importlib-metadata<8.8.0,>=6.0 in /usr/local/lib/python3.12/dist-packages (from opentelemetry-api<2.0.0,>=1.30.0->strands-agents->-r requirements.txt (line 1)) (8.7.0)\n",
+            "Requirement already satisfied: opentelemetry-instrumentation==0.59b0 in /usr/local/lib/python3.12/dist-packages (from opentelemetry-instrumentation-threading<1.00b0,>=0.51b0->strands-agents->-r requirements.txt (line 1)) (0.59b0)\n",
+            "Requirement already satisfied: wrapt<2.0.0,>=1.0.0 in /usr/local/lib/python3.12/dist-packages (from opentelemetry-instrumentation-threading<1.00b0,>=0.51b0->strands-agents->-r requirements.txt (line 1)) (1.17.3)\n",
+            "Requirement already satisfied: opentelemetry-semantic-conventions==0.59b0 in /usr/local/lib/python3.12/dist-packages (from opentelemetry-instrumentation==0.59b0->opentelemetry-instrumentation-threading<1.00b0,>=0.51b0->strands-agents->-r requirements.txt (line 1)) (0.59b0)\n",
+            "Requirement already satisfied: packaging>=18.0 in /usr/local/lib/python3.12/dist-packages (from opentelemetry-instrumentation==0.59b0->opentelemetry-instrumentation-threading<1.00b0,>=0.51b0->strands-agents->-r requirements.txt (line 1)) (25.0)\n",
+            "Requirement already satisfied: wcwidth in /usr/local/lib/python3.12/dist-packages (from prompt-toolkit<4.0.0,>=3.0.51->strands-agents-tools->-r requirements.txt (line 2)) (0.2.14)\n",
+            "Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.12/dist-packages (from pydantic<3.0.0,>=2.4.0->strands-agents->-r requirements.txt (line 1)) (0.7.0)\n",
+            "Requirement already satisfied: pydantic-core==2.41.4 in /usr/local/lib/python3.12/dist-packages (from pydantic<3.0.0,>=2.4.0->strands-agents->-r requirements.txt (line 1)) (2.41.4)\n",
+            "Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.12/dist-packages (from requests<3.0.0,>=2.28.0->strands-agents-tools->-r requirements.txt (line 2)) (3.4.4)\n",
+            "Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.12/dist-packages (from requests<3.0.0,>=2.28.0->strands-agents-tools->-r requirements.txt (line 2)) (3.11)\n",
+            "Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.12/dist-packages (from requests<3.0.0,>=2.28.0->strands-agents-tools->-r requirements.txt (line 2)) (2025.11.12)\n",
+            "Requirement already satisfied: oauthlib>=3.0.0 in /usr/local/lib/python3.12/dist-packages (from requests-oauthlib>=0.7.0->google-auth-oauthlib->-r requirements.txt (line 4)) (3.3.1)\n",
+            "Requirement already satisfied: markdown-it-py>=2.2.0 in /usr/local/lib/python3.12/dist-packages (from rich<15.0.0,>=14.0.0->strands-agents-tools->-r requirements.txt (line 2)) (4.0.0)\n",
+            "Requirement already satisfied: pygments<3.0.0,>=2.13.0 in /usr/local/lib/python3.12/dist-packages (from rich<15.0.0,>=14.0.0->strands-agents-tools->-r requirements.txt (line 2)) (2.19.2)\n",
+            "Requirement already satisfied: slack_sdk<4,>=3.38.0 in /usr/local/lib/python3.12/dist-packages (from slack-bolt<2.0.0,>=1.23.0->strands-agents-tools->-r requirements.txt (line 2)) (3.39.0)\n",
+            "Requirement already satisfied: mpmath<1.4,>=1.1.0 in /usr/local/lib/python3.12/dist-packages (from sympy<2.0.0,>=1.12.0->strands-agents-tools->-r requirements.txt (line 2)) (1.3.0)\n",
+            "Requirement already satisfied: soupsieve>1.2 in /usr/local/lib/python3.12/dist-packages (from beautifulsoup4<5,>=4.9->markdownify<2.0.0,>=1.0.0->strands-agents-tools->-r requirements.txt (line 2)) (2.8)\n",
+            "Requirement already satisfied: httpcore==1.* in /usr/local/lib/python3.12/dist-packages (from httpx<1,>=0.25.0->anthropic<1.0.0,>=0.21.0->strands-agents[anthropic]->-r requirements.txt (line 3)) (1.0.9)\n",
+            "Requirement already satisfied: h11>=0.16 in /usr/local/lib/python3.12/dist-packages (from httpcore==1.*->httpx<1,>=0.25.0->anthropic<1.0.0,>=0.21.0->strands-agents[anthropic]->-r requirements.txt (line 3)) (0.16.0)\n",
+            "Requirement already satisfied: zipp>=3.20 in /usr/local/lib/python3.12/dist-packages (from importlib-metadata<8.8.0,>=6.0->opentelemetry-api<2.0.0,>=1.30.0->strands-agents->-r requirements.txt (line 1)) (3.23.0)\n",
+            "Requirement already satisfied: mdurl~=0.1 in /usr/local/lib/python3.12/dist-packages (from markdown-it-py>=2.2.0->rich<15.0.0,>=14.0.0->strands-agents-tools->-r requirements.txt (line 2)) (0.1.2)\n",
+            "Requirement already satisfied: pyasn1<0.7.0,>=0.6.1 in /usr/local/lib/python3.12/dist-packages (from pyasn1-modules>=0.2.1->google-auth>=2.15.0->google-auth-oauthlib->-r requirements.txt (line 4)) (0.6.1)\n",
+            "Requirement already satisfied: python-dotenv>=0.21.0 in /usr/local/lib/python3.12/dist-packages (from pydantic-settings>=2.5.2->mcp<2.0.0,>=1.11.0->strands-agents->-r requirements.txt (line 1)) (1.2.1)\n",
+            "Requirement already satisfied: cryptography>=3.4.0 in /usr/local/lib/python3.12/dist-packages (from pyjwt[crypto]>=2.10.1->mcp<2.0.0,>=1.11.0->strands-agents->-r requirements.txt (line 1)) (43.0.3)\n",
+            "Requirement already satisfied: click>=7.0 in /usr/local/lib/python3.12/dist-packages (from uvicorn>=0.31.1->mcp<2.0.0,>=1.11.0->strands-agents->-r requirements.txt (line 1)) (8.3.1)\n",
+            "Requirement already satisfied: cffi>=1.12 in /usr/local/lib/python3.12/dist-packages (from cryptography>=3.4.0->pyjwt[crypto]>=2.10.1->mcp<2.0.0,>=1.11.0->strands-agents->-r requirements.txt (line 1)) (2.0.0)\n",
+            "Requirement already satisfied: pycparser in /usr/local/lib/python3.12/dist-packages (from cffi>=1.12->cryptography>=3.4.0->pyjwt[crypto]>=2.10.1->mcp<2.0.0,>=1.11.0->strands-agents->-r requirements.txt (line 1)) (2.23)\n"
+          ]
+        }
+      ],
+      "source": [
+        "!pip install -r requirements.txt\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import csv\n",
+        "import io\n",
+        "import importlib\n",
+        "import gspread\n",
+        "\n",
+        "from strands import Agent\n",
+        "from strands_tools import calculator, file_read, shell\n",
+        "from strands.models.anthropic import AnthropicModel\n",
+        "from strands_tools import http_request, current_time, calculator\n",
+        "from strands_tools.browser import LocalChromiumBrowser"
+      ],
+      "metadata": {
+        "id": "4ackqsyEhfeW"
+      },
+      "execution_count": 50,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import google.auth\n",
+        "from google.colab import auth\n",
+        "\n",
+        "# Authenticate user with Google Colab\n",
+        "auth.authenticate_user()\n",
+        "\n",
+        "# Get default credentials\n",
+        "credentials, project_id = google.auth.default()\n",
+        "\n",
+        "# Authorize gspread with the obtained credentials\n",
+        "gc = gspread.authorize(credentials)\n",
+        "sheet = gc.open_by_url(\"https://docs.google.com/spreadsheets/d/1Cy82Bo73OP9lmgjy6-aRmO2rMwyRKz6ydbKjLlFaCmA/edit?usp=sharing\")\n",
+        "worksheet = sheet.sheet1\n",
+        "\n",
+        "# Get headers from the first row\n",
+        "headers = worksheet.row_values(1)\n",
+        "\n",
+        "# Get all records as dictionaries, specifying the expected headers\n",
+        "data = worksheet.get_all_records(expected_headers=headers)\n",
+        "\n",
+        "# Extract Application URLs\n",
+        "urls_to_check = [row['Application URL'] for row in data if row.get('Application URL')]\n",
+        "\n",
+        "# Build a better prompt with the URLs directly\n",
+        "prompt = f'''\n",
+        "Check if registration is open for each of these trade show URLs:\n",
+        "\n",
+        "{chr(10).join(f\"- {url}\" for url in urls_to_check)}\n",
+        "\n",
+        "For each URL:\n",
+        "1) Use the browser tool to visit the page\n",
+        "2) Determine if registration/applications are OPEN, CLOSED, or UNKNOWN\n",
+        "3) If the site mentions when registration opens, calculate the time until opening\n",
+        "\n",
+        "Return your findings for each URL.\n",
+        "'''"
+      ],
+      "metadata": {
+        "id": "pNAvt2KPh4aZ"
+      },
+      "execution_count": 55,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 411
+        },
+        "id": "f2aefead",
+        "outputId": "cf6c2275-4d67-4ccd-be5d-79592f61e044"
+      },
+      "source": [
+        "agent = Agent(\n",
+        "    model=AnthropicModel(),\n",
+        "    tools=[\n",
+        "        LocalChromiumBrowser(),\n",
+        "        calculator,\n",
+        "        current_time\n",
+        "    ]\n",
+        ")\n",
+        "\n",
+        "response = agent(prompt)\n",
+        "\n",
+        "display(response)"
+      ],
+      "execution_count": 57,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "WARNING:strands.tools.registry:tool=<<strands_tools.browser.local_chromium_browser.LocalChromiumBrowser object at 0x790ec11dddc0>> | unrecognized tool specification\n"
+          ]
+        },
+        {
+          "output_type": "error",
+          "ename": "KeyError",
+          "evalue": "'max_tokens'",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mKeyError\u001b[0m                                  Traceback (most recent call last)",
+            "\u001b[0;32m/tmp/ipython-input-4109405458.py\u001b[0m in \u001b[0;36m<cell line: 0>\u001b[0;34m()\u001b[0m\n\u001b[1;32m      8\u001b[0m )\n\u001b[1;32m      9\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m---> 10\u001b[0;31m \u001b[0mresponse\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0magent\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mprompt\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m     11\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     12\u001b[0m \u001b[0mdisplay\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mresponse\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.12/dist-packages/strands/agent/agent.py\u001b[0m in \u001b[0;36m__call__\u001b[0;34m(self, prompt, invocation_state, structured_output_model, **kwargs)\u001b[0m\n\u001b[1;32m    347\u001b[0m                 \u001b[0;34m-\u001b[0m \u001b[0mstructured_output\u001b[0m\u001b[0;34m:\u001b[0m \u001b[0mParsed\u001b[0m \u001b[0mstructured\u001b[0m \u001b[0moutput\u001b[0m \u001b[0mwhen\u001b[0m \u001b[0mstructured_output_model\u001b[0m \u001b[0mwas\u001b[0m \u001b[0mspecified\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    348\u001b[0m         \"\"\"\n\u001b[0;32m--> 349\u001b[0;31m         return run_async(\n\u001b[0m\u001b[1;32m    350\u001b[0m             lambda: self.invoke_async(\n\u001b[1;32m    351\u001b[0m                 \u001b[0mprompt\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0minvocation_state\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0minvocation_state\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mstructured_output_model\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mstructured_output_model\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m**\u001b[0m\u001b[0mkwargs\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.12/dist-packages/strands/_async.py\u001b[0m in \u001b[0;36mrun_async\u001b[0;34m(async_func)\u001b[0m\n\u001b[1;32m     31\u001b[0m         \u001b[0mcontext\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mcontextvars\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mcopy_context\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     32\u001b[0m         \u001b[0mfuture\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mexecutor\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0msubmit\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mcontext\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mrun\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mexecute\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m---> 33\u001b[0;31m         \u001b[0;32mreturn\u001b[0m \u001b[0mfuture\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mresult\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m",
+            "\u001b[0;32m/usr/lib/python3.12/concurrent/futures/_base.py\u001b[0m in \u001b[0;36mresult\u001b[0;34m(self, timeout)\u001b[0m\n\u001b[1;32m    447\u001b[0m                     \u001b[0;32mraise\u001b[0m \u001b[0mCancelledError\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    448\u001b[0m                 \u001b[0;32melif\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_state\u001b[0m \u001b[0;34m==\u001b[0m \u001b[0mFINISHED\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 449\u001b[0;31m                     \u001b[0;32mreturn\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m__get_result\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    450\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    451\u001b[0m                 \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_condition\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mwait\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mtimeout\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/lib/python3.12/concurrent/futures/_base.py\u001b[0m in \u001b[0;36m__get_result\u001b[0;34m(self)\u001b[0m\n\u001b[1;32m    399\u001b[0m         \u001b[0;32mif\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_exception\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    400\u001b[0m             \u001b[0;32mtry\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 401\u001b[0;31m                 \u001b[0;32mraise\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_exception\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    402\u001b[0m             \u001b[0;32mfinally\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    403\u001b[0m                 \u001b[0;31m# Break a reference cycle with the exception in self._exception\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/lib/python3.12/concurrent/futures/thread.py\u001b[0m in \u001b[0;36mrun\u001b[0;34m(self)\u001b[0m\n\u001b[1;32m     57\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     58\u001b[0m         \u001b[0;32mtry\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m---> 59\u001b[0;31m             \u001b[0mresult\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mfn\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m*\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0margs\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m**\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mkwargs\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m     60\u001b[0m         \u001b[0;32mexcept\u001b[0m \u001b[0mBaseException\u001b[0m \u001b[0;32mas\u001b[0m \u001b[0mexc\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     61\u001b[0m             \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mfuture\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mset_exception\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mexc\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.12/dist-packages/opentelemetry/instrumentation/threading/__init__.py\u001b[0m in \u001b[0;36mwrapped_func\u001b[0;34m(*func_args, **func_kwargs)\u001b[0m\n\u001b[1;32m    169\u001b[0m             \u001b[0;32mtry\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    170\u001b[0m                 \u001b[0mtoken\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mcontext\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mattach\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0motel_context\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 171\u001b[0;31m                 \u001b[0;32mreturn\u001b[0m \u001b[0moriginal_func\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m*\u001b[0m\u001b[0mfunc_args\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m**\u001b[0m\u001b[0mfunc_kwargs\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    172\u001b[0m             \u001b[0;32mfinally\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    173\u001b[0m                 \u001b[0;32mif\u001b[0m \u001b[0mtoken\u001b[0m \u001b[0;32mis\u001b[0m \u001b[0;32mnot\u001b[0m \u001b[0;32mNone\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.12/dist-packages/strands/_async.py\u001b[0m in \u001b[0;36mexecute\u001b[0;34m()\u001b[0m\n\u001b[1;32m     26\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     27\u001b[0m     \u001b[0;32mdef\u001b[0m \u001b[0mexecute\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m \u001b[0;34m->\u001b[0m \u001b[0mT\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m---> 28\u001b[0;31m         \u001b[0;32mreturn\u001b[0m \u001b[0masyncio\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mrun\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mexecute_async\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m     29\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     30\u001b[0m     \u001b[0;32mwith\u001b[0m \u001b[0mThreadPoolExecutor\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m \u001b[0;32mas\u001b[0m \u001b[0mexecutor\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.12/dist-packages/nest_asyncio.py\u001b[0m in \u001b[0;36mrun\u001b[0;34m(main, debug)\u001b[0m\n\u001b[1;32m     28\u001b[0m         \u001b[0mtask\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0masyncio\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mensure_future\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mmain\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     29\u001b[0m         \u001b[0;32mtry\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m---> 30\u001b[0;31m             \u001b[0;32mreturn\u001b[0m \u001b[0mloop\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mrun_until_complete\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mtask\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m     31\u001b[0m         \u001b[0;32mfinally\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     32\u001b[0m             \u001b[0;32mif\u001b[0m \u001b[0;32mnot\u001b[0m \u001b[0mtask\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mdone\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.12/dist-packages/nest_asyncio.py\u001b[0m in \u001b[0;36mrun_until_complete\u001b[0;34m(self, future)\u001b[0m\n\u001b[1;32m     96\u001b[0m                 raise RuntimeError(\n\u001b[1;32m     97\u001b[0m                     'Event loop stopped before Future completed.')\n\u001b[0;32m---> 98\u001b[0;31m             \u001b[0;32mreturn\u001b[0m \u001b[0mf\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mresult\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m     99\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    100\u001b[0m     \u001b[0;32mdef\u001b[0m \u001b[0m_run_once\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/lib/python3.12/asyncio/futures.py\u001b[0m in \u001b[0;36mresult\u001b[0;34m(self)\u001b[0m\n\u001b[1;32m    200\u001b[0m         \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m__log_traceback\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0;32mFalse\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    201\u001b[0m         \u001b[0;32mif\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_exception\u001b[0m \u001b[0;32mis\u001b[0m \u001b[0;32mnot\u001b[0m \u001b[0;32mNone\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 202\u001b[0;31m             \u001b[0;32mraise\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_exception\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mwith_traceback\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_exception_tb\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    203\u001b[0m         \u001b[0;32mreturn\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_result\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    204\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/lib/python3.12/asyncio/tasks.py\u001b[0m in \u001b[0;36m__step_run_and_handle_result\u001b[0;34m(***failed resolving arguments***)\u001b[0m\n\u001b[1;32m    312\u001b[0m                 \u001b[0;31m# We use the `send` method directly, because coroutines\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    313\u001b[0m                 \u001b[0;31m# don't have `__iter__` and `__next__` methods.\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 314\u001b[0;31m                 \u001b[0mresult\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mcoro\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0msend\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;32mNone\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    315\u001b[0m             \u001b[0;32melse\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    316\u001b[0m                 \u001b[0mresult\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mcoro\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mthrow\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mexc\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.12/dist-packages/strands/_async.py\u001b[0m in \u001b[0;36mexecute_async\u001b[0;34m()\u001b[0m\n\u001b[1;32m     23\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     24\u001b[0m     \u001b[0;32masync\u001b[0m \u001b[0;32mdef\u001b[0m \u001b[0mexecute_async\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m \u001b[0;34m->\u001b[0m \u001b[0mT\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m---> 25\u001b[0;31m         \u001b[0;32mreturn\u001b[0m \u001b[0;32mawait\u001b[0m \u001b[0masync_func\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m     26\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     27\u001b[0m     \u001b[0;32mdef\u001b[0m \u001b[0mexecute\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m \u001b[0;34m->\u001b[0m \u001b[0mT\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.12/dist-packages/strands/agent/agent.py\u001b[0m in \u001b[0;36minvoke_async\u001b[0;34m(self, prompt, invocation_state, structured_output_model, **kwargs)\u001b[0m\n\u001b[1;32m    390\u001b[0m             \u001b[0mprompt\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0minvocation_state\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0minvocation_state\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mstructured_output_model\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mstructured_output_model\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m**\u001b[0m\u001b[0mkwargs\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    391\u001b[0m         )\n\u001b[0;32m--> 392\u001b[0;31m         \u001b[0;32masync\u001b[0m \u001b[0;32mfor\u001b[0m \u001b[0mevent\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mevents\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    393\u001b[0m             \u001b[0m_\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mevent\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    394\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.12/dist-packages/strands/agent/agent.py\u001b[0m in \u001b[0;36mstream_async\u001b[0;34m(self, prompt, invocation_state, structured_output_model, **kwargs)\u001b[0m\n\u001b[1;32m    586\u001b[0m                 \u001b[0mevents\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_run_loop\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mmessages\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mmerged_state\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mstructured_output_model\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    587\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 588\u001b[0;31m                 \u001b[0;32masync\u001b[0m \u001b[0;32mfor\u001b[0m \u001b[0mevent\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mevents\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    589\u001b[0m                     \u001b[0mevent\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mprepare\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0minvocation_state\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mmerged_state\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    590\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.12/dist-packages/strands/agent/agent.py\u001b[0m in \u001b[0;36m_run_loop\u001b[0;34m(self, messages, invocation_state, structured_output_model)\u001b[0m\n\u001b[1;32m    634\u001b[0m             \u001b[0;31m# Execute the event loop cycle with retry logic for context limits\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    635\u001b[0m             \u001b[0mevents\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_execute_event_loop_cycle\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0minvocation_state\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mstructured_output_context\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 636\u001b[0;31m             \u001b[0;32masync\u001b[0m \u001b[0;32mfor\u001b[0m \u001b[0mevent\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mevents\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    637\u001b[0m                 \u001b[0;31m# Signal from the model provider that the message sent by the user should be redacted,\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    638\u001b[0m                 \u001b[0;31m# likely due to a guardrail.\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.12/dist-packages/strands/agent/agent.py\u001b[0m in \u001b[0;36m_execute_event_loop_cycle\u001b[0;34m(self, invocation_state, structured_output_context)\u001b[0m\n\u001b[1;32m    682\u001b[0m                 \u001b[0mstructured_output_context\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mstructured_output_context\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    683\u001b[0m             )\n\u001b[0;32m--> 684\u001b[0;31m             \u001b[0;32masync\u001b[0m \u001b[0;32mfor\u001b[0m \u001b[0mevent\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mevents\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    685\u001b[0m                 \u001b[0;32myield\u001b[0m \u001b[0mevent\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    686\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.12/dist-packages/strands/event_loop/event_loop.py\u001b[0m in \u001b[0;36mevent_loop_cycle\u001b[0;34m(agent, invocation_state, structured_output_context)\u001b[0m\n\u001b[1;32m    150\u001b[0m             \u001b[0magent\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mcycle_span\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mcycle_trace\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0minvocation_state\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mtracer\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mstructured_output_context\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    151\u001b[0m         )\n\u001b[0;32m--> 152\u001b[0;31m         \u001b[0;32masync\u001b[0m \u001b[0;32mfor\u001b[0m \u001b[0mmodel_event\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mmodel_events\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    153\u001b[0m             \u001b[0;32mif\u001b[0m \u001b[0;32mnot\u001b[0m \u001b[0misinstance\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mmodel_event\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mModelStopReason\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    154\u001b[0m                 \u001b[0;32myield\u001b[0m \u001b[0mmodel_event\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.12/dist-packages/strands/event_loop/event_loop.py\u001b[0m in \u001b[0;36m_handle_model_execution\u001b[0;34m(agent, cycle_span, cycle_trace, invocation_state, tracer, structured_output_context)\u001b[0m\n\u001b[1;32m    394\u001b[0m                     \u001b[0;32myield\u001b[0m \u001b[0mEventLoopThrottleEvent\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mdelay\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mcurrent_delay\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    395\u001b[0m                 \u001b[0;32melse\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 396\u001b[0;31m                     \u001b[0;32mraise\u001b[0m \u001b[0me\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    397\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    398\u001b[0m     \u001b[0;32mtry\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.12/dist-packages/strands/event_loop/event_loop.py\u001b[0m in \u001b[0;36m_handle_model_execution\u001b[0;34m(agent, cycle_span, cycle_trace, invocation_state, tracer, structured_output_context)\u001b[0m\n\u001b[1;32m    335\u001b[0m                 \u001b[0mtool_specs\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0magent\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mtool_registry\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mget_all_tool_specs\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    336\u001b[0m             \u001b[0;32mtry\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 337\u001b[0;31m                 async for event in stream_messages(\n\u001b[0m\u001b[1;32m    338\u001b[0m                     \u001b[0magent\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mmodel\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    339\u001b[0m                     \u001b[0magent\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0msystem_prompt\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.12/dist-packages/strands/event_loop/streaming.py\u001b[0m in \u001b[0;36mstream_messages\u001b[0;34m(model, system_prompt, messages, tool_specs, tool_choice, system_prompt_content, **kwargs)\u001b[0m\n\u001b[1;32m    455\u001b[0m     )\n\u001b[1;32m    456\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 457\u001b[0;31m     \u001b[0;32masync\u001b[0m \u001b[0;32mfor\u001b[0m \u001b[0mevent\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mprocess_stream\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mchunks\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mstart_time\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    458\u001b[0m         \u001b[0;32myield\u001b[0m \u001b[0mevent\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.12/dist-packages/strands/event_loop/streaming.py\u001b[0m in \u001b[0;36mprocess_stream\u001b[0;34m(chunks, start_time)\u001b[0m\n\u001b[1;32m    389\u001b[0m     \u001b[0mmetrics\u001b[0m\u001b[0;34m:\u001b[0m \u001b[0mMetrics\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mMetrics\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mlatencyMs\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m0\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mtimeToFirstByteMs\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m0\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    390\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 391\u001b[0;31m     \u001b[0;32masync\u001b[0m \u001b[0;32mfor\u001b[0m \u001b[0mchunk\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mchunks\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    392\u001b[0m         \u001b[0;31m# Track first byte time when we get first content\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    393\u001b[0m         \u001b[0;32mif\u001b[0m \u001b[0mfirst_byte_time\u001b[0m \u001b[0;32mis\u001b[0m \u001b[0;32mNone\u001b[0m \u001b[0;32mand\u001b[0m \u001b[0;34m(\u001b[0m\u001b[0;34m\"contentBlockDelta\"\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mchunk\u001b[0m \u001b[0;32mor\u001b[0m \u001b[0;34m\"contentBlockStart\"\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mchunk\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.12/dist-packages/strands/models/anthropic.py\u001b[0m in \u001b[0;36mstream\u001b[0;34m(self, messages, tool_specs, system_prompt, tool_choice, **kwargs)\u001b[0m\n\u001b[1;32m    393\u001b[0m         \"\"\"\n\u001b[1;32m    394\u001b[0m         \u001b[0mlogger\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mdebug\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"formatting request\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 395\u001b[0;31m         \u001b[0mrequest\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mformat_request\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mmessages\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mtool_specs\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0msystem_prompt\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mtool_choice\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    396\u001b[0m         \u001b[0mlogger\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mdebug\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"request=<%s>\"\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mrequest\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    397\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.12/dist-packages/strands/models/anthropic.py\u001b[0m in \u001b[0;36mformat_request\u001b[0;34m(self, messages, tool_specs, system_prompt, tool_choice)\u001b[0m\n\u001b[1;32m    219\u001b[0m         \"\"\"\n\u001b[1;32m    220\u001b[0m         return {\n\u001b[0;32m--> 221\u001b[0;31m             \u001b[0;34m\"max_tokens\"\u001b[0m\u001b[0;34m:\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mconfig\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0;34m\"max_tokens\"\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    222\u001b[0m             \u001b[0;34m\"messages\"\u001b[0m\u001b[0;34m:\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_format_request_messages\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mmessages\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    223\u001b[0m             \u001b[0;34m\"model\"\u001b[0m\u001b[0;34m:\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mconfig\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0;34m\"model_id\"\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;31mKeyError\u001b[0m: 'max_tokens'"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "6xHpf59E3NIO"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}

@@ -4,5 +4,6 @@ strands-agents[anthropic]
 google-auth-oauthlib
 google-auth-httplib2
 google-api-python-client
+graph_builder
 gspread
 playwright
